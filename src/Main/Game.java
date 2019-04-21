@@ -7,6 +7,7 @@ import static org.lwjgl.opengl.GL11.glColor3f;
 import static org.lwjgl.opengl.GL11.glEnd;
 import static org.lwjgl.opengl.GL11.glTranslatef;
 import static org.lwjgl.opengl.GL11.glVertex3f;
+import static org.lwjgl.opengl.GL11.*;
 
 public class Game {
 
@@ -53,6 +54,7 @@ public class Game {
         glVertex3f(-1, 2, 0);
         glVertex3f(0, 2, 0);
         glEnd();
+       
     }
 
 }

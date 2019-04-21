@@ -3,10 +3,16 @@ package Main;
 // Мы рады пришельцам с других проектов
 // Не ругайте за русский , у меня в шк было 2
 // Мышку после включения не двигай, до отрисовки моделей, а то не найдешь потом ее в этой черной дыре
+import Actors.Model;
+import Actors.OBJLoader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import static org.lwjgl.opengl.GL11.*;
 import org.lwjgl.opengl.*;
 import org.lwjgl.*;
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.util.vector.Vector3f;
 
 public class Main {
 
@@ -26,6 +32,26 @@ public class Main {
 
         //Создаем переменную для вычисления времени между кадрами
         long lastFrame = System.currentTimeMillis();
+
+        int objectDisplayList = glGenLists(1);
+        glNewList(objectDisplayList, GL_COMPILE);
+        {
+            Model m = null;
+            try {
+                m = OBJLoader.loadModel(new File("src/models/box.obj"));
+            } catch (FileNotFoundException e) {
+                System.out.println("Can't Find File");
+                Display.destroy();
+                System.exit(0);
+            } catch (IOException e) {
+                System.out.println("Exception in file load");
+                Display.destroy();
+                System.exit(0);
+            }
+
+
+            
+        }
 
         while (!Display.isCloseRequested()) {
 
