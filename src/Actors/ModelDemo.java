@@ -27,7 +27,7 @@ public class ModelDemo {
     public static void main(String[] args) {
         setUpDisplay();
         setUpDisplayLists();
-        setUpCamera();
+       // setUpCamera();
         while (!Display.isCloseRequested()) {
             render();
             checkInput();

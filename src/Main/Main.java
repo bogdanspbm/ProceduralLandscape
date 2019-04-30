@@ -33,12 +33,13 @@ public class Main {
         //Создаем переменную для вычисления времени между кадрами
         long lastFrame = System.currentTimeMillis();
 
-        int objectDisplayList = glGenLists(1);
+       /* int objectDisplayList = glGenLists(1);
         glNewList(objectDisplayList, GL_COMPILE);
         {
             Model m = null;
-            try {
-                m = OBJLoader.loadModel(new File("src/models/box.obj"));
+           try {
+                System.out.print("skip");
+                //m = OBJLoader.loadModel(new File("src/models/box.obj"));
             } catch (FileNotFoundException e) {
                 System.out.println("Can't Find File");
                 Display.destroy();
@@ -51,7 +52,7 @@ public class Main {
 
 
             
-        }
+        }*/
 
         while (!Display.isCloseRequested()) {
 
