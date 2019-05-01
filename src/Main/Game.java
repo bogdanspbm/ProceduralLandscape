@@ -61,7 +61,7 @@ public class Game {
             System.exit(1);
         }
         glBegin(GL_TRIANGLES);
-        glColor3f(1, 1, 1);
+        glColor3f(0.2f, 0.8f, 0.2f);
         for (Model.Face face : m.getFaces()) {
             Vector3f n1 = m.getNormals().get(face.getNormalIndices()[0] - 1);
             glNormal3f(n1.x, n1.y, n1.z);
