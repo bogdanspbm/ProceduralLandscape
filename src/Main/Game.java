@@ -1,5 +1,6 @@
 package Main;
 
+import Actors.Actor;
 import Actors.Model;
 import Actors.OBJLoader;
 import Landscape.Terrain;
@@ -24,7 +25,7 @@ public class Game {
 
     private Camera cam;
     private Terrain myTerrain;
-    private static final String MODEL_LOCATION = "res/models/landscape.obj";
+    private Actor demoter = new Actor("res/models/landscape.obj"); // Загрузка модели
 
     public Game() {
         cam = new Camera(0, 1, 5); // Cоздаем камеру с координатами x=0, y = 1, z = 5;
@@ -41,43 +42,6 @@ public class Game {
         GL11.glRotatef(cam.getRotation().y, 1, 0, 0); // Выставляю поворот камеры по вертикали
         GL11.glRotatef(cam.getRotation().x, 0, 1, 0); // Выставляю повоторо камеры по горизонтали
         glTranslatef(-cam.getPos().x, -cam.getPos().y, -cam.getPos().z); // Ставлю координаты в пространтсве
-
-        //Есть разные режимы GL_TRIANGLES будет основным
-        //По сути это главная тема которой мы занимаемся это генерируем вертексы и рисуем полигон
-        //Вроде не сложно так что залетай
-        
-        
-        //Модель гружу
-        Model m = null;
-        try {
-            m = OBJLoader.loadModel(new File(MODEL_LOCATION));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            Display.destroy();
-            System.exit(1);
-        } catch (IOException e) {
-            e.printStackTrace();
-            Display.destroy();
-            System.exit(1);
-        }
-        glBegin(GL_TRIANGLES);
-        glColor3f(0.2f, 0.8f, 0.2f);
-        for (Model.Face face : m.getFaces()) {
-            Vector3f n1 = m.getNormals().get(face.getNormalIndices()[0] - 1);
-            glNormal3f(n1.x, n1.y, n1.z);
-            Vector3f v1 = m.getVertices().get(face.getVertexIndices()[0] - 1);
-            glVertex3f(v1.x, v1.y, v1.z);
-            Vector3f n2 = m.getNormals().get(face.getNormalIndices()[1] - 1);
-            glNormal3f(n2.x, n2.y, n2.z);
-            Vector3f v2 = m.getVertices().get(face.getVertexIndices()[1] - 1);
-            glVertex3f(v2.x, v2.y, v2.z);
-            Vector3f n3 = m.getNormals().get(face.getNormalIndices()[2] - 1);
-            glNormal3f(n3.x, n3.y, n3.z);
-            Vector3f v3 = m.getVertices().get(face.getVertexIndices()[2] - 1);
-            glVertex3f(v3.x, v3.y, v3.z);
-        }
-        glEnd();
-
+        demoter.drawModel(); // Отрисовка модели ( Загрузка выше ) (См класс Actor)
     }
-
 }
