@@ -1,8 +1,11 @@
 package Main;
 
-import org.lwjgl.opengl.Display;
 import org.lwjgl.util.glu.GLU;
 import static org.lwjgl.opengl.GL11.*;
+
+import org.lwjgl.opengl.Display;
+
+import utility.*;
 
 public class Frame {
 
@@ -38,9 +41,19 @@ public class Frame {
         GLU.gluPerspective(45, (float) this.width / (float) this.height, 0.3f, 1000f);
         glMatrixMode(GL_MODELVIEW);
 
-        glFrontFace(GL_CW);
+        glShadeModel(GL_SMOOTH);
+
+        glEnable(GL_LIGHTING);
+        glEnable(GL_LIGHT0);
+        glLightModel(GL_LIGHT_MODEL_AMBIENT, BufferTools.asFlippedFloatBuffer(new float[]{0.05f, 0.05f, 0.05f, 1f}));
+        glLight(GL_LIGHT0, GL_POSITION, BufferTools.asFlippedFloatBuffer(new float[]{0, 0, 0, 1}));
+
+        glFrontFace(GL_CCW);
         glCullFace(GL_BACK);
         glEnable(GL_CULL_FACE);
+        glEnable(GL_COLOR_MATERIAL);
+        glColorMaterial(GL_FRONT, GL_DIFFUSE);
+
     }
 
 }

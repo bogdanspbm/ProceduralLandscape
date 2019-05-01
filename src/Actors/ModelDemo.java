@@ -22,12 +22,12 @@ public class ModelDemo {
 
     private static int bunnyDisplayList;
 
-    private static final String MODEL_LOCATION = "res/models/bunny.obj";
+    private static final String MODEL_LOCATION = "res/models/cube.obj";
 
     public static void main(String[] args) {
         setUpDisplay();
         setUpDisplayLists();
-       // setUpCamera();
+        //setUpCamera();
         while (!Display.isCloseRequested()) {
             render();
             checkInput();
@@ -97,7 +97,7 @@ public class ModelDemo {
         glCallList(bunnyDisplayList);
     }
 
-    /*private static void setUpCamera() {
+   /* private static void setUpCamera() {
         camera = new EulerCamera.Builder().setAspectRatio((float) Display.getWidth() / Display.getHeight())
                 .setRotation(-1.12f, 0.16f, 0f).setPosition(-1.38f, 1.36f, 7.95f).setFieldOfView(60).build();
         camera.applyOptimalStates();
