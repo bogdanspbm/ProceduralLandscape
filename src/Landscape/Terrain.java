@@ -52,7 +52,7 @@ public class Terrain {
     private void fillZerosVerticesMatrix() {
         for (int i = 0; i < cellCount; i++) {
             for (int k = 0; k < cellCount; k++) {
-                verticesMatrix[i][k] = new Vector3f((float) (i), (float) 0, (float) (k));
+                verticesMatrix[i][k] = new Vector3f((float) (i - cellCount / 2), (float) 0, (float) (k - cellCount / 2));
                 // i и k в данном случае координаты 
                 // по идеи можно поменять систему счисления тем самым уменьшив размер поля и уменьшить полигоны
                 // как вариант поделив на const
