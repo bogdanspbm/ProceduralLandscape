@@ -11,7 +11,7 @@ public class Frame {
 
     private int width, height; // Размеры окна 
     private Game game; // Клас в котором все что связано с миром
-    private static float[] lightPosition = {-2.19f, 1.36f, 11.45f, 1f};
+    private static float[] lightPosition = {-2.19f, 1.36f, 11.45f, 0.5f};
 
     public Frame() { // Конструктор
         this.width = Display.getWidth();
@@ -31,6 +31,8 @@ public class Frame {
         glPushMatrix();
 
         game.render();
+        //glLight(GL_LIGHT0, GL_POSITION, BufferTools.asFlippedFloatBuffer(lightPosition));
+       // lightPosition = new float[]{game.cam.getRotation().x, game.cam.getRotation().y, 1.0f, 1};
 
         glPopMatrix();
     }
@@ -39,7 +41,7 @@ public class Frame {
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
         GLU.gluPerspective(45, (float) this.width / (float) this.height, 0.3f, 1000f);
-        glMatrixMode(GL_MODELVIEW);
+        //glMatrixMode(GL_MODELVIEW);
 
         setUpLighting();
 
@@ -51,7 +53,7 @@ public class Frame {
         glEnable(GL_LIGHTING);
         glEnable(GL_LIGHT0);
         glLightModel(GL_LIGHT_MODEL_AMBIENT, BufferTools.asFlippedFloatBuffer(new float[]{0.05f, 0.05f, 0.05f, 1f}));
-        glLight(GL_LIGHT0, GL_POSITION, BufferTools.asFlippedFloatBuffer(new float[]{0, 0, 0, 1}));
+        glLight(GL_LIGHT0, GL_POSITION, BufferTools.asFlippedFloatBuffer(lightPosition));
         glEnable(GL_CULL_FACE);
         glCullFace(GL_BACK);
         glEnable(GL_COLOR_MATERIAL);

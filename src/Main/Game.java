@@ -7,9 +7,10 @@ import static org.lwjgl.opengl.GL11.glTranslatef;
 
 public class Game {
 
-    private final Camera cam;
+    public final Camera cam;
     private final Terrain myTerrain;
     private Actor demoter = new Actor("res/models/landscape.obj"); // Загрузка модели
+    int i = 0;
 
     public Game() {
         cam = new Camera(0, 1, 5); // Cоздаем камеру с координатами x=0, y = 1, z = 5;
