@@ -1,6 +1,7 @@
 package Main;
 
 import Actors.Actor;
+import Landscape.SkyBox;
 import Landscape.Terrain;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
@@ -11,6 +12,7 @@ public class Game {
     public final Camera cam;
     private final Terrain myTerrain;
     private Actor demoter = new Actor("res/models/landscape.obj"); // Загрузка модели
+    private SkyBox sky = new SkyBox("res/textures/day_skybox.png");
     int i = 0;
 
     public Game() {
@@ -33,5 +35,6 @@ public class Game {
             myTerrain.refreshTerrain();
         }
         myTerrain.drawTerrain();
+        sky.drawSkyBox();
     }
 }

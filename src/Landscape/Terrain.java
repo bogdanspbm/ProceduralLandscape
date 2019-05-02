@@ -13,7 +13,7 @@ import org.lwjgl.util.vector.Vector3f;
 public class Terrain {
 
     private List<Vector3f> vertices = new ArrayList<>();
-    private int cellCount = 30;
+    private int cellCount = 32;
     private Vector3f[][] verticesMatrix;
     private int maxHeight = 5;
 
