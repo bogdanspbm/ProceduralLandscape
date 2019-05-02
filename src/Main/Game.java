@@ -1,30 +1,14 @@
 package Main;
 
 import Actors.Actor;
-import Actors.Model;
-import Actors.OBJLoader;
 import Landscape.Terrain;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import org.lwjgl.opengl.Display;
-
 import org.lwjgl.opengl.GL11;
-import static org.lwjgl.opengl.GL11.GL_QUADS;
-import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
-import static org.lwjgl.opengl.GL11.glBegin;
-import static org.lwjgl.opengl.GL11.glColor3f;
-import static org.lwjgl.opengl.GL11.glEnd;
-import static org.lwjgl.opengl.GL11.glNormal3f;
-
 import static org.lwjgl.opengl.GL11.glTranslatef;
-import static org.lwjgl.opengl.GL11.glVertex3f;
-import org.lwjgl.util.vector.Vector3f;
 
 public class Game {
 
-    private Camera cam;
-    private Terrain myTerrain;
+    private final Camera cam;
+    private final Terrain myTerrain;
     private Actor demoter = new Actor("res/models/landscape.obj"); // Загрузка модели
 
     public Game() {
