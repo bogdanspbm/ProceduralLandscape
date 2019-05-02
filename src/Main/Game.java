@@ -26,6 +26,7 @@ public class Game {
         GL11.glRotatef(cam.getRotation().y, 1, 0, 0); // Выставляю поворот камеры по вертикали
         GL11.glRotatef(cam.getRotation().x, 0, 1, 0); // Выставляю повоторо камеры по горизонтали
         glTranslatef(-cam.getPos().x, -cam.getPos().y, -cam.getPos().z); // Ставлю координаты в пространтсве
-        demoter.drawModel(); // Отрисовка модели ( Загрузка выше ) (См класс Actor)
+        //demoter.drawModel(); // Отрисовка модели ( Загрузка выше ) (См класс Actor)
+        myTerrain.drawTerrain();
     }
 }
