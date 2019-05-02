@@ -12,13 +12,23 @@ import org.lwjgl.util.vector.Vector3f;
 
 public class Terrain {
 
-    private final List<Vector3f> vertices = new ArrayList<Vector3f>();
-    private int cellCount = 20;
+    private List<Vector3f> vertices = new ArrayList<>();
+    private int cellCount = 30;
     private Vector3f[][] verticesMatrix;
-    private int maxHeight = 3;
+    private int maxHeight = 5;
 
     public Terrain(int newSize, int height) {
         calcCellCount();
+        fillZerosVerticesMatrix();
+        fillCorners();
+        squareFill(0, 0, cellCount - 1, cellCount - 1);
+        fillVericexArray();
+    }
+
+    public void refreshTerrain() {
+        // Обнуляю переменные и запускаю все из конструктора
+        maxHeight = 2 + (int) (Math.random() * 20);
+        vertices = new ArrayList<>();
         fillZerosVerticesMatrix();
         fillCorners();
         squareFill(0, 0, cellCount - 1, cellCount - 1);
@@ -53,10 +63,10 @@ public class Terrain {
     private void fillCorners() {
         // Выставляю рандомные значения высот на краях карты 
         // Можно эксперементировать делая один больше другой меньше 
-        verticesMatrix[0][0].y = (float) (Math.random() * 4 * maxHeight) - 40.0f;
-        verticesMatrix[0][cellCount - 1].y = (float) (Math.random() * maxHeight) - 40.0f;
-        verticesMatrix[cellCount - 1][cellCount - 1].y = (float) (Math.random() * 7 * maxHeight) - 40.0f;
-        verticesMatrix[cellCount - 1][0].y = (float) (Math.random() * maxHeight) - 40.0f;
+        verticesMatrix[0][0].y = (float) (Math.random() * 2 * maxHeight) - 40.0f;
+        verticesMatrix[0][cellCount - 1].y = (float) (Math.random() / 2 * maxHeight) - 46.0f;
+        verticesMatrix[cellCount - 1][cellCount - 1].y = (float) (Math.random() * maxHeight) - 45.0f;
+        verticesMatrix[cellCount - 1][0].y = (float) (Math.random() * maxHeight) - 45.0f;
     }
 
     // X,Y индекс координата в матрице verticesMatrix
@@ -156,12 +166,22 @@ public class Terrain {
         // Эта функция отрисует все твои клетки
         glBegin(GL_TRIANGLES);
         glColor3f(0.2f, 0.8f, 0.2f);
+
         for (int k = 0; k < vertices.size() / 3; k += 1) {
+
+            if (vertices.get(k * 3).y > -maxHeight / 2 - 30f) { // Попытка раскрасить участок по высоте
+                glColor3f(1.0f, 1.0f, 1.0f);
+            } else {
+                glColor3f(0.2f, 0.8f, 0.2f);
+            }
+
             calcNormal(vertices.get(k * 3 + 0), vertices.get(k * 3 + 1), vertices.get(k * 3 + 2));
+
             glVertex3f(vertices.get(k * 3 + 0).x, vertices.get(k * 3 + 0).y, vertices.get(k * 3 + 0).z);
             glVertex3f(vertices.get(k * 3 + 1).x, vertices.get(k * 3 + 1).y, vertices.get(k * 3 + 1).z);
             glVertex3f(vertices.get(k * 3 + 2).x, vertices.get(k * 3 + 2).y, vertices.get(k * 3 + 2).z);
         }
+
         glEnd();
     }
 }

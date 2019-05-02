@@ -2,6 +2,7 @@ package Main;
 
 import Actors.Actor;
 import Landscape.Terrain;
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 import static org.lwjgl.opengl.GL11.glTranslatef;
 
@@ -28,6 +29,9 @@ public class Game {
         GL11.glRotatef(cam.getRotation().x, 0, 1, 0); // Выставляю повоторо камеры по горизонтали
         glTranslatef(-cam.getPos().x, -cam.getPos().y, -cam.getPos().z); // Ставлю координаты в пространтсве
         //demoter.drawModel(); // Отрисовка модели ( Загрузка выше ) (См класс Actor)
+        if (Keyboard.isKeyDown(Keyboard.KEY_R)) {
+            myTerrain.refreshTerrain();
+        }
         myTerrain.drawTerrain();
     }
 }
