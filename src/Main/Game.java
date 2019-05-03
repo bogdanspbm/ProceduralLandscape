@@ -16,7 +16,7 @@ public class Game {
     int i = 0;
 
     public Game() {
-        cam = new Camera(0, 1, 5); // Cоздаем камеру с координатами x=0, y = 1, z = 5;
+        cam = new Camera(20, 20, 20); // Cоздаем камеру с координатами x=0, y = 1, z = 5;
         // Хз почему, но у нас походу плоскость земли в y,z мне лень фиксить
         myTerrain = new Terrain(3, 3);
     }

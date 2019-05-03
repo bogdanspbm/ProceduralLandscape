@@ -2,6 +2,7 @@ package Landscape;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.lwjgl.opengl.GL11;
 import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
 import static org.lwjgl.opengl.GL11.glBegin;
 import static org.lwjgl.opengl.GL11.glColor3f;
@@ -9,30 +10,54 @@ import static org.lwjgl.opengl.GL11.glEnd;
 import static org.lwjgl.opengl.GL11.glNormal3f;
 import static org.lwjgl.opengl.GL11.glVertex3f;
 import org.lwjgl.util.vector.Vector3f;
+import org.lwjgl.util.vector.Vector4f;
 
 public class Terrain {
 
     private List<Vector3f> vertices = new ArrayList<>();
-    private int cellCount = 32;
+    private List<Vector4f> cellsToDo = new ArrayList<>();
+    private List<Vector4f> rhumbsToDo = new ArrayList<>();
+    private int cellCount = 128;
+    private int state = 0;
     private Vector3f[][] verticesMatrix;
-    private int maxHeight = 5;
+    private float maxHeight = 12;
+    private float lowPoint = 10000, hightPoint = -10000;
+    private int depth = 1;
 
     public Terrain(int newSize, int height) {
         calcCellCount();
         fillZerosVerticesMatrix();
         fillCorners();
-        squareFill(0, 0, cellCount - 1, cellCount - 1);
+        buildTerrain();
         fillVericexArray();
+        getHightAndLow();
+    }
+
+    private void drawDemoOcean() {
+
+        float h = (hightPoint - lowPoint) / 5 + lowPoint;
+        glBegin(GL11.GL_QUADS);
+        glColor3f(0.2f, 0.25f, 0.8f);
+        glNormal3f(0, 1, 0);
+        glVertex3f(-cellCount / 2, h, -cellCount / 2);
+        glVertex3f(-cellCount / 2, h, cellCount / 2);
+        glVertex3f(cellCount / 2, h, cellCount / 2);
+        glVertex3f(cellCount / 2, h, -cellCount / 2);
+        glEnd();
     }
 
     public void refreshTerrain() {
         // Обнуляю переменные и запускаю все из конструктора
-        maxHeight = 2 + (int) (Math.random() * 20);
         vertices = new ArrayList<>();
+        cellsToDo = new ArrayList<>();
+        rhumbsToDo = new ArrayList<>();
+        state = 0;
+        depth = 1;
         fillZerosVerticesMatrix();
         fillCorners();
-        squareFill(0, 0, cellCount - 1, cellCount - 1);
+        buildTerrain();
         fillVericexArray();
+        getHightAndLow();
     }
 
     // Считаю размер матрицы в зависимости от заданной величены, тк.
@@ -63,13 +88,71 @@ public class Terrain {
     private void fillCorners() {
         // Выставляю рандомные значения высот на краях карты 
         // Можно эксперементировать делая один больше другой меньше 
-        verticesMatrix[0][0].y = (float) (Math.random() * 2 * maxHeight) - 40.0f;
-        verticesMatrix[0][cellCount - 1].y = (float) (Math.random() / 2 * maxHeight) - 46.0f;
-        verticesMatrix[cellCount - 1][cellCount - 1].y = (float) (Math.random() * maxHeight) - 45.0f;
-        verticesMatrix[cellCount - 1][0].y = (float) (Math.random() * maxHeight) - 45.0f;
+        verticesMatrix[0][0].y = (float) (Math.random() * maxHeight);
+        verticesMatrix[0][cellCount - 1].y = (float) (Math.random() * maxHeight);
+        verticesMatrix[cellCount - 1][cellCount - 1].y = (float) (Math.random() * maxHeight);
+        verticesMatrix[cellCount - 1][0].y = (float) (Math.random() * maxHeight);
+        cellsToDo.add(new Vector4f(0, 0, cellCount - 1, cellCount - 1));
     }
 
+    private void getHightAndLow() {
+        float h = 0;
+        lowPoint = 10000;
+        hightPoint = -10000;
+        for (int i = 0; i < cellCount; i++) {
+            for (int k = 0; k < cellCount; k++) {
+                h = verticesMatrix[i][k].y;
+                if (h < lowPoint) {
+                    lowPoint = h;
+                }
+                if (h > hightPoint) {
+                    hightPoint = h;
+                }
+            }
+        }
+    }
+
+    private void buildTerrain() {
+        int lim = 0;
+        Vector4f coord;
+        while (true) {
+            if (state == 0) { // Строим клетки
+                lim = cellsToDo.size();
+                for (int i = 0; i < lim; i++) {
+                    coord = cellsToDo.get(0);
+                    if ((int) (coord.z - coord.x) / 2 == 0) {
+                        state = 2;
+                        break;
+                    }
+                    squareFill((int) coord.x, (int) coord.y, (int) coord.z, (int) coord.w);
+                    cellsToDo.remove(0);
+                }
+                if (state == 0) {
+                    state = 1;
+                }
+            } else { // Строим ромбы
+                lim = rhumbsToDo.size();
+                for (int i = 0; i < lim; i++) {
+                    coord = rhumbsToDo.get(0);
+                    if ((int) (coord.z - coord.x) / 2 == 0) {
+                        return;
+                    }
+                    fillRhombus((int) coord.x, (int) coord.y, (int) coord.z, (int) coord.w);
+                    rhumbsToDo.remove(0);
+                }
+                depth *= 2;
+
+                if (state == 1) {
+                    state = 0;
+                } else {
+                    return;
+                }
+            }
+        }
+
+    }
     // X,Y индекс координата в матрице verticesMatrix
+
     private void squareFill(int leftTopX, int leftTopY, int rightDownX, int rightDownY) {
 
         // Алгоритм Diamond Square
@@ -90,45 +173,73 @@ public class Terrain {
                     + verticesMatrix[leftTopX][rightDownY].y
                     + verticesMatrix[rightDownX][leftTopY].y
                     + verticesMatrix[rightDownX][rightDownY].y) / 4
-                    + (float) Math.random();
+                    + (verticesMatrix[leftTopX][leftTopY].y
+                    + verticesMatrix[leftTopX][rightDownY].y
+                    + verticesMatrix[rightDownX][leftTopY].y
+                    + verticesMatrix[rightDownX][rightDownY].y) / 4 * (float) (-0.5 + Math.random()) * 4 / depth;
             // Опять же можно модифицировать
             //но главное это брать сумму 4 соседей
 
             // Записываю высоту 
             verticesMatrix[centerX][centerY].y = centerZ;
 
-            // Делаю тоже самое, но для левой, правой и тд точки
-            float topCenterZ = (verticesMatrix[leftTopX][leftTopY].y
-                    + verticesMatrix[rightDownX][leftTopY].y
-                    + centerZ) / 3
-                    + (float) Math.random();
-            float downCenterZ = (verticesMatrix[leftTopX][rightDownY].y
-                    + verticesMatrix[rightDownX][rightDownY].y
-                    + centerZ) / 3
-                    + (float) Math.random();
-            float leftCenterZ = (verticesMatrix[leftTopX][leftTopY].y
-                    + verticesMatrix[leftTopX][rightDownY].y
-                    + centerZ) / 3
-                    + (float) Math.random();
-            float rightCenterZ = (verticesMatrix[rightDownX][leftTopY].y
-                    + verticesMatrix[rightDownX][rightDownY].y
-                    + centerZ) / 3
-                    + (float) Math.random();
-
-            // Записываю высоту
-            verticesMatrix[centerX][centerY + (int) dy].y = topCenterZ;
-            verticesMatrix[centerX][centerY - (int) dy].y = downCenterZ;
-            verticesMatrix[centerX - (int) dx][centerY].y = leftCenterZ;
-            verticesMatrix[centerX + (int) dx][centerY].y = rightCenterZ;
+            rhumbsToDo.add(new Vector4f(leftTopX - (int) dx, leftTopY, centerX, rightDownY));
+            rhumbsToDo.add(new Vector4f(leftTopX, leftTopY + (int) dy, rightDownX, centerY));
+            rhumbsToDo.add(new Vector4f(centerX, leftTopY, rightDownX + (int) dx, rightDownY));
+            rhumbsToDo.add(new Vector4f(leftTopX, centerY, rightDownX, rightDownY - (int) dy));
 
             // Запускаю рекурсивно для левого вверхнего квадрата
-            squareFill(leftTopX, leftTopY, centerX, centerY);
-            // Правого нижнего
-            squareFill(centerX, centerY, rightDownX, rightDownY);
-            // Правого вверхнего
-            squareFill(centerX, leftTopY, rightDownX, centerY);
-            // Левого нижнего
-            squareFill(leftTopX, centerY, centerX, rightDownY);
+            cellsToDo.add(new Vector4f(leftTopX, leftTopY, centerX, centerY));
+            cellsToDo.add(new Vector4f(centerX, centerY, rightDownX, rightDownY));
+            cellsToDo.add(new Vector4f(centerX, leftTopY, rightDownX, centerY));
+            cellsToDo.add(new Vector4f(leftTopX, centerY, centerX, rightDownY));
+
+        }
+    }
+
+    private void fillRhombus(int left, int top, int right, int down) {
+        float dx = (right - left) / 2;
+        float dy = (top - down) / 2;
+
+        // Если разница не 0 => можно произвести деление
+        if ((int) dx != 0 && (int) dy != 0) {
+
+            int myLeft = left;
+            if (myLeft < 0) {
+                myLeft += cellCount - 1;
+            }
+            int myTop = top;
+            if (myTop < 0) {
+                myTop += cellCount - 1;
+            }
+            int myDown = down;
+            if (myDown >= cellCount) {
+                myDown -= cellCount;
+            }
+            int myRight = right;
+            if (myRight >= cellCount) {
+                myRight -= cellCount;
+            }
+
+            // Нахожу координату центра клетки
+            int centerX = left + (int) dx;
+            int centerY = down + (int) dy;
+
+            // Считаю ей по формуле высоту 
+            float centerZ = (verticesMatrix[myLeft][centerY].y
+                    + verticesMatrix[centerX][myDown].y
+                    + verticesMatrix[myRight][centerY].y
+                    + verticesMatrix[centerX][myTop].y) / 4
+                    + (verticesMatrix[myLeft][centerY].y
+                    + verticesMatrix[centerX][myDown].y
+                    + verticesMatrix[myRight][centerY].y
+                    + verticesMatrix[centerX][myTop].y) / 4
+                    * (float) (Math.random() - 0.5) / depth;
+            // Опять же можно модифицировать
+            //но главное это брать сумму 4 соседей
+
+            // Записываю высоту 
+            verticesMatrix[centerX][centerY].y = centerZ;
         }
     }
 
@@ -165,12 +276,11 @@ public class Terrain {
     public void drawTerrain() {
         // Эта функция отрисует все твои клетки
         glBegin(GL_TRIANGLES);
-        glColor3f(0.2f, 0.8f, 0.2f);
 
         for (int k = 0; k < vertices.size() / 3; k += 1) {
 
-            if (vertices.get(k * 3).y > -maxHeight / 2 - 30f) { // Попытка раскрасить участок по высоте
-                glColor3f(1.0f, 1.0f, 1.0f);
+            if (vertices.get(k * 3).y > (hightPoint - lowPoint) / 2 + lowPoint) { // Попытка раскрасить участок по высоте
+                glColor3f(0.7f, 0.7f, 0.8f);
             } else {
                 glColor3f(0.2f, 0.8f, 0.2f);
             }
@@ -183,5 +293,7 @@ public class Terrain {
         }
 
         glEnd();
+
+        drawDemoOcean();
     }
 }
