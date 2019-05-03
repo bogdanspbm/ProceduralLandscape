@@ -24,6 +24,7 @@ public class Terrain {
     private float maxHeight = 22;
     private float lowPoint = 10000, hightPoint = -10000;
     private int depth = 1;
+    private Sea sea = new Sea(cellCount);
 
     public Terrain(int newSize, int height) {
         calcCellCount();
@@ -32,19 +33,6 @@ public class Terrain {
         buildTerrain();
         fillVericexArray();
         getHightAndLow();
-    }
-
-    private void drawDemoOcean() {
-
-        float h = (hightPoint - lowPoint) / 5 + lowPoint;
-        glBegin(GL11.GL_QUADS);
-        glColor3f(0.2f, 0.25f, 0.8f);
-        glNormal3f(0, 1, 0);
-        glVertex3f(-cellCount / 2 / scaler, h, -cellCount / 2 / scaler);
-        glVertex3f(-cellCount / 2 / scaler, h, cellCount / 2 / scaler);
-        glVertex3f(cellCount / 2 / scaler, h, cellCount / 2 / scaler);
-        glVertex3f(cellCount / 2 / scaler, h, -cellCount / 2 / scaler);
-        glEnd();
     }
 
     public void refreshTerrain() {
@@ -111,6 +99,7 @@ public class Terrain {
                 }
             }
         }
+        sea.seaLevel = lowPoint + (hightPoint - lowPoint) / 5;
     }
 
     private void buildTerrain() {
@@ -295,6 +284,7 @@ public class Terrain {
 
         glEnd();
 
-        drawDemoOcean();
+        //drawDemoOcean();
+        sea.drawSea(0.006f);
     }
 }
