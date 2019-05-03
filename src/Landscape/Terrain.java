@@ -18,9 +18,10 @@ public class Terrain {
     private List<Vector4f> cellsToDo = new ArrayList<>();
     private List<Vector4f> rhumbsToDo = new ArrayList<>();
     private int cellCount = 128;
+    private float scaler = 1;
     private int state = 0;
     private Vector3f[][] verticesMatrix;
-    private float maxHeight = 12;
+    private float maxHeight = 22;
     private float lowPoint = 10000, hightPoint = -10000;
     private int depth = 1;
 
@@ -39,10 +40,10 @@ public class Terrain {
         glBegin(GL11.GL_QUADS);
         glColor3f(0.2f, 0.25f, 0.8f);
         glNormal3f(0, 1, 0);
-        glVertex3f(-cellCount / 2, h, -cellCount / 2);
-        glVertex3f(-cellCount / 2, h, cellCount / 2);
-        glVertex3f(cellCount / 2, h, cellCount / 2);
-        glVertex3f(cellCount / 2, h, -cellCount / 2);
+        glVertex3f(-cellCount / 2 / scaler, h, -cellCount / 2 / scaler);
+        glVertex3f(-cellCount / 2 / scaler, h, cellCount / 2 / scaler);
+        glVertex3f(cellCount / 2 / scaler, h, cellCount / 2 / scaler);
+        glVertex3f(cellCount / 2 / scaler, h, -cellCount / 2 / scaler);
         glEnd();
     }
 
@@ -77,7 +78,7 @@ public class Terrain {
     private void fillZerosVerticesMatrix() {
         for (int i = 0; i < cellCount; i++) {
             for (int k = 0; k < cellCount; k++) {
-                verticesMatrix[i][k] = new Vector3f((float) (i - cellCount / 2), (float) 0, (float) (k - cellCount / 2));
+                verticesMatrix[i][k] = new Vector3f((float) (i - cellCount / 2) / scaler, (float) 0, (float) (k - cellCount / 2) / scaler);
                 // i и k в данном случае координаты 
                 // по идеи можно поменять систему счисления тем самым уменьшив размер поля и уменьшить полигоны
                 // как вариант поделив на const
@@ -176,7 +177,7 @@ public class Terrain {
                     + (verticesMatrix[leftTopX][leftTopY].y
                     + verticesMatrix[leftTopX][rightDownY].y
                     + verticesMatrix[rightDownX][leftTopY].y
-                    + verticesMatrix[rightDownX][rightDownY].y) / 4 * (float) (-0.5 + Math.random()) * 4 / depth;
+                    + verticesMatrix[rightDownX][rightDownY].y) / 4 * (float) (-0.5 + Math.random()) * 4 / depth / scaler;
             // Опять же можно модифицировать
             //но главное это брать сумму 4 соседей
 
@@ -200,6 +201,9 @@ public class Terrain {
     private void fillRhombus(int left, int top, int right, int down) {
         float dx = (right - left) / 2;
         float dy = (top - down) / 2;
+        int centerX = left + (int) dx;
+        int centerY = down + (int) dy;
+        float centerZ = 0;
 
         // Если разница не 0 => можно произвести деление
         if ((int) dx != 0 && (int) dy != 0) {
@@ -207,34 +211,31 @@ public class Terrain {
             int myLeft = left;
             if (myLeft < 0) {
                 myLeft += cellCount - 1;
+                centerZ -= verticesMatrix[myLeft][centerY].y / 4;
             }
             int myTop = top;
             if (myTop < 0) {
                 myTop += cellCount - 1;
+                centerZ -= verticesMatrix[centerX][myTop].y / 4;
             }
             int myDown = down;
             if (myDown >= cellCount) {
                 myDown -= cellCount;
+                centerZ -= verticesMatrix[centerX][myDown].y / 4;
             }
             int myRight = right;
             if (myRight >= cellCount) {
                 myRight -= cellCount;
+                centerZ -= verticesMatrix[myRight][centerY].y / 4;
             }
 
             // Нахожу координату центра клетки
-            int centerX = left + (int) dx;
-            int centerY = down + (int) dy;
-
             // Считаю ей по формуле высоту 
-            float centerZ = (verticesMatrix[myLeft][centerY].y
+            centerZ += (verticesMatrix[myLeft][centerY].y
                     + verticesMatrix[centerX][myDown].y
                     + verticesMatrix[myRight][centerY].y
                     + verticesMatrix[centerX][myTop].y) / 4
-                    + (verticesMatrix[myLeft][centerY].y
-                    + verticesMatrix[centerX][myDown].y
-                    + verticesMatrix[myRight][centerY].y
-                    + verticesMatrix[centerX][myTop].y) / 4
-                    * (float) (Math.random() - 0.5) / depth;
+                    * (1 + (float) (Math.random() - 0.5) / depth / scaler);
             // Опять же можно модифицировать
             //но главное это брать сумму 4 соседей
 
