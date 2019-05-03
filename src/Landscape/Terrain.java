@@ -17,14 +17,14 @@ public class Terrain {
     private List<Vector3f> vertices = new ArrayList<>();
     private List<Vector4f> cellsToDo = new ArrayList<>();
     private List<Vector4f> rhumbsToDo = new ArrayList<>();
-    private int cellCount = 128;
-    private float scaler = 1;
+    private int cellCount = 100;
+    private float scaler = 1f;
     private int state = 0;
     private Vector3f[][] verticesMatrix;
     private float maxHeight = 22;
     private float lowPoint = 10000, hightPoint = -10000;
     private int depth = 1;
-    private Sea sea = new Sea(cellCount);
+    private Sea sea = new Sea(cellCount, scaler);
 
     public Terrain(int newSize, int height) {
         calcCellCount();

@@ -21,8 +21,9 @@ public class Sea {
     private float dtime = 0;
     public float seaLevel = 0f;
 
-    public Sea(int size) {
+    public Sea(int size, float scaler) {
         this.cellCount = size;
+        this.scaler = scaler;
         calcCellCount();
         fillZerosVerticesMatrix();
         fillVericexArray();
@@ -89,7 +90,7 @@ public class Sea {
 
         for (int i = 0; i < vertices.size(); i++) {
             dph = (float) Math.asin((vertices.get(i).y / maxHeight));
-            vertices.get(i).y = (float) ((Math.sin(dtime + verticesStartZ.get(i)) * maxHeight)) + seaLevel;
+            vertices.get(i).y = (float) ((Math.sin(dtime + verticesStartZ.get(i)) * maxHeight)) / scaler + seaLevel;
         }
 
     }
