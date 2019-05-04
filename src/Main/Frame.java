@@ -11,7 +11,7 @@ public class Frame {
 
     private int width, height; // Размеры окна 
     private Game game; // Клас в котором все что связано с миром
-    private static float[] lightPosition = {-2.19f, 100.36f, 11.45f, 1f};
+    private static float[] lightPosition = {-20.19f, 100.36f, 110.45f, 1f};
 
     public Frame() { // Конструктор
         this.width = Display.getWidth();
@@ -39,7 +39,6 @@ public class Frame {
 
     private void InitGL() { // Выставляем настройки камеры, FOV, режимы отрисовки и тд.
         glMatrixMode(GL_PROJECTION);
-        glEnable(GL_TEXTURE_2D);
         glLoadIdentity();
         GLU.gluPerspective(45, (float) this.width / (float) this.height, 0.3f, 1000f);
         //glMatrixMode(GL_MODELVIEW);
@@ -53,7 +52,7 @@ public class Frame {
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_LIGHTING);
         glEnable(GL_LIGHT0);
-        glLightModel(GL_LIGHT_MODEL_AMBIENT, BufferTools.asFlippedFloatBuffer(new float[]{0.0f, 0.0f, 0.0f, 1f}));
+        glLightModel(GL_LIGHT_MODEL_AMBIENT, BufferTools.asFlippedFloatBuffer(new float[]{0.05f, 0.05f, 0.05f, 1f}));
         glLight(GL_LIGHT0, GL_POSITION, BufferTools.asFlippedFloatBuffer(lightPosition));
         glEnable(GL_CULL_FACE);
         glCullFace(GL_BACK);

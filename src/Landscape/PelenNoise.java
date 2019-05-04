@@ -7,9 +7,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
 import static org.lwjgl.opengl.GL11.glBegin;
 import static org.lwjgl.opengl.GL11.glColor3f;
+import static org.lwjgl.opengl.GL11.glDisable;
+import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.opengl.GL11.glEnd;
 import static org.lwjgl.opengl.GL11.glNormal3f;
 import static org.lwjgl.opengl.GL11.glTexCoord2f;
@@ -21,12 +24,13 @@ import org.newdawn.slick.opengl.TextureLoader;
 public final class PelenNoise {
 
     private List<Vector3f> vertices = new ArrayList<>();
-    private int cellCount = 50;
+    private int cellCount = 100;
     private Vector3f[][] verticesMatrix = new Vector3f[cellCount][cellCount];
-    private float scaler = 4;
+    private float scaler = 0.25f;
     private float defaultFreq = 0.15f;
-    private float defaultAmplitude = 2;
+    private float defaultAmplitude = 16f;
     private float defaultPersis = 0.2f;
+    private int inum = 1;
     private int NUM_OCTAVES = 50;
     private int varToChange = 0;
     float seed = (float) (Math.PI * 2 * 10 * (1 + Math.random()));
@@ -72,15 +76,20 @@ public final class PelenNoise {
 
     public void refresh() {
         vertices = new ArrayList<>();
-        seed = (float) (Math.PI * 2 * 10 * (1 + Math.random()));
+        inum = getIPrime((int) (Math.random() * 19));
         fillZerosVerticesMatrix();
         genNoise();
         fillVericexArray();
         getHightAndLow();
     }
 
+    private int getIPrime(int i) {
+        int[] primes = {3, 5, 7, 11, 13, 17, 31, 37, 41, 43, 47, 53, 59, 71, 73, 79, 97, 113, 157, 179};
+        return primes[i];
+    }
+
     private float noise2D(int x, int y) {
-        int n = (int) (x + y * 57);
+        int n = (int) (x + y * inum);
         n = (n << 13) ^ n;
         return (1.0f - ((n * (n * n * 15731 + 789221) + 1376312589) & 0x7fffffff)
                 / 1073741824.0f);
@@ -138,21 +147,21 @@ public final class PelenNoise {
             frequency *= Math.E;
         }
 
-        total += 1;
-        total /= 2;
-        float res = (float) (total);//приводим цвет к значению 0-255…
+        //total += 1;
+        //total /= 2;
+        float res = (float) (total);
         return res;
     }
 
     private void genNoise() {
         // случайное число, которое призвано внести
         // случайность в нашу текстуру
-        float fac = seed;
+        float fac = (float) (Math.PI * 2 * 10 * (1 + Math.random()));
 
         for (int i = 0; i < cellCount; i++) {
             for (int j = 0; j < cellCount; j++) {
                 //проходим по всем элементам массива и заполняем их значениями   
-                verticesMatrix[i][j].y = perlinNoise2D((float) i, (float) j, fac);
+                verticesMatrix[i][j].y = 4f * perlinNoise2D((float) i, (float) j, fac);
             }
         }
     }
@@ -222,42 +231,33 @@ public final class PelenNoise {
         glNormal3f(normal.x / length, normal.y / length, normal.z / length);
     }
 
+    private void setVertexWithColor(int num) {
+        if ((float) (vertices.get(num).y - lowPoint) / (hightPoint - lowPoint) > 0.95f) {
+            glTexCoord2f((float) (vertices.get(num).y - lowPoint) / (hightPoint - lowPoint) - 0.05f, 0.5f);
+        } else {
+            glTexCoord2f((float) (vertices.get(num).y - lowPoint) / (hightPoint - lowPoint), 0.5f);
+        }
+        glVertex3f(vertices.get(num).x, vertices.get(num).y, vertices.get(num).z);
+    }
+
     public void drawTerrain() {
         // Эта функция отрисует все твои клетки
+        glEnable(GL_TEXTURE_2D);
         glBegin(GL_TRIANGLES);
-        glColor3f(0.9f, 0.9f, 0.9f);
 
         for (int k = 0; k < vertices.size() / 3; k += 1) {
 
             calcNormal(vertices.get(k * 3 + 0), vertices.get(k * 3 + 1), vertices.get(k * 3 + 2));
 
-            //glColor3f(vertices.get(k * 3 + 0).y, vertices.get(k * 3 + 0).y, vertices.get(k * 3 + 0).y);
-            if ((float) (vertices.get(k * 3 + 0).y - lowPoint) / (hightPoint - lowPoint) > 0.90f) {
-                glTexCoord2f((float) (vertices.get(k * 3 + 0).y - lowPoint) / (hightPoint - lowPoint) - 0.1f, 0.5f);
-            } else {
-                glTexCoord2f((float) (vertices.get(k * 3 + 0).y - lowPoint) / (hightPoint - lowPoint), 0.5f);
-            }
-            glVertex3f(vertices.get(k * 3 + 0).x, vertices.get(k * 3 + 0).y, vertices.get(k * 3 + 0).z);
+            setVertexWithColor(k * 3 + 0);
+            setVertexWithColor(k * 3 + 1);
+            setVertexWithColor(k * 3 + 2);
 
-            //glColor3f(vertices.get(k * 3 + 1).y, vertices.get(k * 3 + 1).y, vertices.get(k * 3 + 1).y);
-            if ((float) (vertices.get(k * 3 + 1).y - lowPoint) / (hightPoint - lowPoint) > 0.90f) {
-                glTexCoord2f((float) (vertices.get(k * 3 + 1).y - lowPoint) / (hightPoint - lowPoint) - 0.1f, 0.5f);
-            } else {
-                glTexCoord2f((float) (vertices.get(k * 3 + 1).y - lowPoint) / (hightPoint - lowPoint), 0.5f);
-            }
-            glVertex3f(vertices.get(k * 3 + 1).x, vertices.get(k * 3 + 1).y, vertices.get(k * 3 + 1).z);
-
-            //glColor3f(vertices.get(k * 3 + 2).y, vertices.get(k * 3 + 2).y, vertices.get(k * 3 + 2).y);
-            if ((float) (vertices.get(k * 3 + 2).y - lowPoint) / (hightPoint - lowPoint) > 0.90f) {
-                glTexCoord2f((float) (vertices.get(k * 3 + 2).y - lowPoint) / (hightPoint - lowPoint) - 0.1f, 0.5f);
-            } else {
-                glTexCoord2f((float) (vertices.get(k * 3 + 2).y - lowPoint) / (hightPoint - lowPoint), 0.5f);
-            }
-            glVertex3f(vertices.get(k * 3 + 2).x, vertices.get(k * 3 + 2).y, vertices.get(k * 3 + 2).z);
         }
 
         glEnd();
 
+        glDisable(GL_TEXTURE_2D);
     }
 
 }

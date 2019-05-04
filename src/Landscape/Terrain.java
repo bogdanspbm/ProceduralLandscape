@@ -1,41 +1,70 @@
 package Landscape;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.lwjgl.opengl.GL11;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
 import static org.lwjgl.opengl.GL11.glBegin;
 import static org.lwjgl.opengl.GL11.glColor3f;
+import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.opengl.GL11.glEnd;
 import static org.lwjgl.opengl.GL11.glNormal3f;
+import static org.lwjgl.opengl.GL11.glTexCoord2f;
 import static org.lwjgl.opengl.GL11.glVertex3f;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
+import org.newdawn.slick.opengl.Texture;
+import org.newdawn.slick.opengl.TextureLoader;
 
 public class Terrain {
 
     private List<Vector3f> vertices = new ArrayList<>();
     private List<Vector4f> cellsToDo = new ArrayList<>();
     private List<Vector4f> rhumbsToDo = new ArrayList<>();
-    private int cellCount = 250;
-    private float scaler = 1f;
+    String filePath = "res/textures/gradient.png";
+    private int cellCount = 100;
+    private float scaler = 8f;
     private int state = 0;
-    private Vector3f[][] verticesMatrix ;
-    private float maxHeight = 22;
+    private Vector3f[][] verticesMatrix;
+    private float maxHeight = 20;
     private float lowPoint = 10000, hightPoint = -10000;
     private int depth = 1;
     private Sea sea = new Sea(cellCount, scaler);
+    Texture gradient;
 
-    public Terrain(int newSize, int height) {
+    public Terrain() {
+        try {
+            gradient = TextureLoader.getTexture("PNG", new FileInputStream(new File(filePath)));
+        } catch (IOException ex) {
+            System.out.print("Can't load texture");
+            Logger.getLogger(SkyBox.class.getName()).log(Level.SEVERE, null, ex);
+            System.exit(0);
+        }
         calcCellCount();
         fillZerosVerticesMatrix();
         fillCorners();
         buildTerrain();
+        nullBorders();
         fillVericexArray();
         getHightAndLow();
     }
 
-    public void refreshTerrain() {
+    private void nullBorders() {
+        for (int i = 0; i < cellCount; i++) {
+            verticesMatrix[0][i].y = 0;
+            verticesMatrix[i][0].y = 0;
+            verticesMatrix[cellCount-1][i].y = 0;
+            verticesMatrix[i][cellCount-1].y = 0;
+        }
+    }
+
+    public void refresh() {
         // Обнуляю переменные и запускаю все из конструктора
         vertices = new ArrayList<>();
         cellsToDo = new ArrayList<>();
@@ -45,6 +74,7 @@ public class Terrain {
         fillZerosVerticesMatrix();
         fillCorners();
         buildTerrain();
+        nullBorders();
         fillVericexArray();
         getHightAndLow();
     }
@@ -260,31 +290,47 @@ public class Terrain {
         Vector3f a = new Vector3f(s2.x - s1.x, s2.y - s1.y, s2.z - s1.z);
         Vector3f b = new Vector3f(s3.x - s2.x, s3.y - s2.y, s3.z - s2.z);
         Vector3f normal = new Vector3f(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x);
-        glNormal3f(normal.x, normal.y, normal.z);
+        float length = (float) Math.pow(normal.x * normal.x + normal.y * normal.y + normal.z * normal.z, 0.5f);
+        glNormal3f(normal.x / length, normal.y / length, normal.z / length);
     }
 
     public void drawTerrain() {
         // Эта функция отрисует все твои клетки
+        glEnable(GL_TEXTURE_2D);
         glBegin(GL_TRIANGLES);
+        gradient.bind();
 
         for (int k = 0; k < vertices.size() / 3; k += 1) {
 
-            if (vertices.get(k * 3).y > (hightPoint - lowPoint) / 2 + lowPoint) { // Попытка раскрасить участок по высоте
-                glColor3f(0.7f, 0.7f, 0.8f);
-            } else {
-                glColor3f(0.2f, 0.8f, 0.2f);
-            }
-
             calcNormal(vertices.get(k * 3 + 0), vertices.get(k * 3 + 1), vertices.get(k * 3 + 2));
 
+            if ((float) (vertices.get(k * 3 + 0).y - lowPoint) / (hightPoint - lowPoint) > 0.95f) {
+                glTexCoord2f((float) (vertices.get(k * 3 + 0).y - lowPoint) / (hightPoint - lowPoint) - 0.05f, 0.6f);
+            } else {
+                glTexCoord2f((float) (vertices.get(k * 3 + 0).y - lowPoint) / (hightPoint - lowPoint), 0.2f);
+            }
             glVertex3f(vertices.get(k * 3 + 0).x, vertices.get(k * 3 + 0).y, vertices.get(k * 3 + 0).z);
+
+            //glColor3f(vertices.get(k * 3 + 1).y, vertices.get(k * 3 + 1).y, vertices.get(k * 3 + 1).y);
+            if ((float) (vertices.get(k * 3 + 1).y - lowPoint) / (hightPoint - lowPoint) > 0.95f) {
+                glTexCoord2f((float) (vertices.get(k * 3 + 1).y - lowPoint) / (hightPoint - lowPoint) - 0.05f, 0.2f);
+            } else {
+                glTexCoord2f((float) (vertices.get(k * 3 + 1).y - lowPoint) / (hightPoint - lowPoint), 0.6f);
+            }
             glVertex3f(vertices.get(k * 3 + 1).x, vertices.get(k * 3 + 1).y, vertices.get(k * 3 + 1).z);
+
+            //glColor3f(vertices.get(k * 3 + 2).y, vertices.get(k * 3 + 2).y, vertices.get(k * 3 + 2).y);
+            if ((float) (vertices.get(k * 3 + 2).y - lowPoint) / (hightPoint - lowPoint) > 0.95f) {
+                glTexCoord2f((float) (vertices.get(k * 3 + 2).y - lowPoint) / (hightPoint - lowPoint) - 0.05f, 0.2f);
+            } else {
+                glTexCoord2f((float) (vertices.get(k * 3 + 2).y - lowPoint) / (hightPoint - lowPoint), 0.2f);
+            }
             glVertex3f(vertices.get(k * 3 + 2).x, vertices.get(k * 3 + 2).y, vertices.get(k * 3 + 2).z);
         }
 
         glEnd();
+        GL11.glDisable(GL_TEXTURE_2D);
 
-        //drawDemoOcean();
         sea.drawSea(0.006f);
     }
 }

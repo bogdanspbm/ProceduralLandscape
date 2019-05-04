@@ -16,6 +16,7 @@ public class Game {
     private Actor demoter = new Actor("res/models/landscape.obj"); // Загрузка модели
     private SkyBox sky = new SkyBox("res/textures/day_skybox.png");
     private PelenNoise terrain = new PelenNoise(100);
+    //private Terrain terrain = new Terrain();
     int i = 0;
 
     public Game() {
@@ -38,19 +39,19 @@ public class Game {
             terrain.refresh();
         }
         if (Keyboard.isKeyDown(Keyboard.KEY_1)) {
-            terrain.changeVarToChange(1);
+            //terrain.changeVarToChange(1);
         }
         if (Keyboard.isKeyDown(Keyboard.KEY_2)) {
-            terrain.changeVarToChange(2);
+            //terrain.changeVarToChange(2);
         }
         if (Keyboard.isKeyDown(Keyboard.KEY_3)) {
-            terrain.changeVarToChange(3);
+            //terrain.changeVarToChange(3);
         }
         if (Keyboard.isKeyDown(Keyboard.KEY_UP)) {
-            terrain.changeVar(0.1f);
+            //terrain.changeVar(0.1f);
         }
         if (Keyboard.isKeyDown(Keyboard.KEY_DOWN)) {
-            terrain.changeVar(-0.1f);
+            //terrain.changeVar(-0.1f);
         }
 
         //myTerrain.drawTerrain();
