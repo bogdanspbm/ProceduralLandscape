@@ -42,43 +42,43 @@ public class SkyBox {
         glNormal3f(0, 0, 1);
 
         //glTexCoord2f(1,0);
-        glVertex3f(100, -100, -100);
+        glVertex3f(10000, -10000, -10000);
         //glTexCoord2f(1,1);
-        glVertex3f(100, 100, -100);
+        glVertex3f(10000, 10000, -10000);
         // glTexCoord2f(0,1);
-        glVertex3f(-100, 100, -100);
+        glVertex3f(-10000, 10000, -10000);
         // glTexCoord2f(0,0);
-        glVertex3f(-100, -100, -100);
+        glVertex3f(-1000, -10000, -10000);
 
         glNormal3f(0, 0, -1);
-        glVertex3f(-100, -100, 100);
-        glVertex3f(-100, 100, 100);
-        glVertex3f(100, 100, 100);
-        glVertex3f(100, -100, 100);
+        glVertex3f(-10000, -10000, 10000);
+        glVertex3f(-10000, 10000, 10000);
+        glVertex3f(10000, 10000, 10000);
+        glVertex3f(10000, -10000, 10000);
 
         glNormal3f(0, -1, 0);
-        glVertex3f(100, 100, -100);
-        glVertex3f(100, 100, 100);
-        glVertex3f(-100, 100, 100);
-        glVertex3f(-100, 100, -100);
+        glVertex3f(10000, 10000, -10000);
+        glVertex3f(10000, 10000, 10000);
+        glVertex3f(-10000, 10000, 10000);
+        glVertex3f(-10000, 10000, -10000);
 
         glNormal3f(0, 1, 0);
-        glVertex3f(-100, -100, -100);
-        glVertex3f(-100, -100, 100);
-        glVertex3f(100, -100, 100);
-        glVertex3f(100, -100, -100);
+        glVertex3f(-10000, -10000, -10000);
+        glVertex3f(-10000, -10000, 10000);
+        glVertex3f(10000, -10000, 10000);
+        glVertex3f(10000, -10000, -10000);
 
         glNormal3f(1, 0, 0);
-        glVertex3f(-100, 100, -100);
-        glVertex3f(-100, 100, 100);
-        glVertex3f(-100, -100, 100);
-        glVertex3f(-100, -100, -100);
+        glVertex3f(-10000, 10000, -10000);
+        glVertex3f(-10000, 10000, 10000);
+        glVertex3f(-10000, -10000, 10000);
+        glVertex3f(-10000, -10000, -10000);
 
         glNormal3f(-1, 0, 0);
-        glVertex3f(100, -100, -100);
-        glVertex3f(100, -100, 100);
-        glVertex3f(100, 100, 100);
-        glVertex3f(100, 100, -100);
+        glVertex3f(10000, -10000, -10000);
+        glVertex3f(10000, -10000, 10000);
+        glVertex3f(10000, 10000, 10000);
+        glVertex3f(10000, 10000, -10000);
 
         glEnd();
     }

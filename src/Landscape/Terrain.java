@@ -17,10 +17,10 @@ public class Terrain {
     private List<Vector3f> vertices = new ArrayList<>();
     private List<Vector4f> cellsToDo = new ArrayList<>();
     private List<Vector4f> rhumbsToDo = new ArrayList<>();
-    private int cellCount = 100;
+    private int cellCount = 250;
     private float scaler = 1f;
     private int state = 0;
-    private Vector3f[][] verticesMatrix;
+    private Vector3f[][] verticesMatrix ;
     private float maxHeight = 22;
     private float lowPoint = 10000, hightPoint = -10000;
     private int depth = 1;
