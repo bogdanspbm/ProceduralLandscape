@@ -35,7 +35,7 @@ public class Game {
         glTranslatef(-cam.getPos().x, -cam.getPos().y, -cam.getPos().z); // Ставлю координаты в пространтсве
         //demoter.drawModel(); // Отрисовка модели ( Загрузка выше ) (См класс Actor)
         if (Keyboard.isKeyDown(Keyboard.KEY_R)) {
-            //myTerrain.refreshTerrain();
+           terrain.refresh();
         }
         //myTerrain.drawTerrain();
         terrain.drawTerrain();

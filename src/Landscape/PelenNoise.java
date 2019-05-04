@@ -13,12 +13,19 @@ import org.lwjgl.util.vector.Vector3f;
 public class PelenNoise {
 
     private List<Vector3f> vertices = new ArrayList<>();
-    private int cellCount = 200;
+    private int cellCount = 50;
     private Vector3f[][] verticesMatrix = new Vector3f[cellCount][cellCount];
     private float scaler = 1;
-    private int NUM_OCTAVES = 5;
+    private int NUM_OCTAVES = 50;
 
     public PelenNoise(int seed) {
+        fillZerosVerticesMatrix();
+        genNoise();
+        fillVericexArray();
+    }
+
+    public void refresh() {
+        vertices = new ArrayList<>();
         fillZerosVerticesMatrix();
         genNoise();
         fillVericexArray();
@@ -83,7 +90,8 @@ public class PelenNoise {
             frequency *= 2;
         }
 
-        //total = 1 / 255;
+        total += 1;
+        total /= 2;
         float res = (float) (total);//приводим цвет к значению 0-255…
         return res;
     }
@@ -97,7 +105,6 @@ public class PelenNoise {
             for (int j = 0; j < cellCount; j++) {
                 //проходим по всем элементам массива и заполняем их значениями   
                 verticesMatrix[i][j].y = perlinNoise2D((float) i, (float) j, fac);
-                System.out.println(j + "/" + i + " = " + verticesMatrix[i][j].y);
             }
         }
     }
@@ -158,8 +165,13 @@ public class PelenNoise {
 
             calcNormal(vertices.get(k * 3 + 0), vertices.get(k * 3 + 1), vertices.get(k * 3 + 2));
 
+            glColor3f(vertices.get(k * 3 + 0).y, vertices.get(k * 3 + 0).y, vertices.get(k * 3 + 0).y);
             glVertex3f(vertices.get(k * 3 + 0).x, vertices.get(k * 3 + 0).y, vertices.get(k * 3 + 0).z);
+
+            glColor3f(vertices.get(k * 3 + 1).y, vertices.get(k * 3 + 1).y, vertices.get(k * 3 + 1).y);
             glVertex3f(vertices.get(k * 3 + 1).x, vertices.get(k * 3 + 1).y, vertices.get(k * 3 + 1).z);
+
+            glColor3f(vertices.get(k * 3 + 2).y, vertices.get(k * 3 + 2).y, vertices.get(k * 3 + 2).y);
             glVertex3f(vertices.get(k * 3 + 2).x, vertices.get(k * 3 + 2).y, vertices.get(k * 3 + 2).z);
         }
 
