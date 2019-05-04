@@ -1,19 +1,27 @@
 package Landscape;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
 import static org.lwjgl.opengl.GL11.glBegin;
 import static org.lwjgl.opengl.GL11.glColor3f;
 import static org.lwjgl.opengl.GL11.glEnd;
 import static org.lwjgl.opengl.GL11.glNormal3f;
+import static org.lwjgl.opengl.GL11.glTexCoord2f;
 import static org.lwjgl.opengl.GL11.glVertex3f;
 import org.lwjgl.util.vector.Vector3f;
+import org.newdawn.slick.opengl.Texture;
+import org.newdawn.slick.opengl.TextureLoader;
 
-public class PelenNoise {
+public final class PelenNoise {
 
     private List<Vector3f> vertices = new ArrayList<>();
-    private int cellCount = 100;
+    private int cellCount = 50;
     private Vector3f[][] verticesMatrix = new Vector3f[cellCount][cellCount];
     private float scaler = 4;
     private float defaultFreq = 0.15f;
@@ -22,11 +30,20 @@ public class PelenNoise {
     private int NUM_OCTAVES = 50;
     private int varToChange = 0;
     float seed = (float) (Math.PI * 2 * 10 * (1 + Math.random()));
+    private float lowPoint = 10000, hightPoint = -10000;
+    String filePath = "res/textures/gradient.png";
+    Texture gradient;
 
     public PelenNoise(int seed) {
-        fillZerosVerticesMatrix();
-        genNoise();
-        fillVericexArray();
+
+        try {
+            gradient = TextureLoader.getTexture("PNG", new FileInputStream(new File(filePath)));
+        } catch (IOException ex) {
+            System.out.print("Can't load texture");
+            Logger.getLogger(SkyBox.class.getName()).log(Level.SEVERE, null, ex);
+            System.exit(0);
+        }
+        refresh();
     }
 
     public void changeVar(float toAdd) {
@@ -59,6 +76,7 @@ public class PelenNoise {
         fillZerosVerticesMatrix();
         genNoise();
         fillVericexArray();
+        getHightAndLow();
     }
 
     private float noise2D(int x, int y) {
@@ -147,6 +165,23 @@ public class PelenNoise {
         return a + (b - a) * t;
     }
 
+    private void getHightAndLow() {
+        float h = 0;
+        lowPoint = 10000;
+        hightPoint = -10000;
+        for (int i = 0; i < cellCount; i++) {
+            for (int k = 0; k < cellCount; k++) {
+                h = verticesMatrix[i][k].y;
+                if (h < lowPoint) {
+                    lowPoint = h;
+                }
+                if (h > hightPoint) {
+                    hightPoint = h;
+                }
+            }
+        }
+    }
+
     private void fillZerosVerticesMatrix() {
         for (int i = 0; i < cellCount; i++) {
             for (int k = 0; k < cellCount; k++) {
@@ -183,7 +218,7 @@ public class PelenNoise {
         Vector3f a = new Vector3f(s2.x - s1.x, s2.y - s1.y, s2.z - s1.z);
         Vector3f b = new Vector3f(s3.x - s2.x, s3.y - s2.y, s3.z - s2.z);
         Vector3f normal = new Vector3f(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x);
-        float length = (float)Math.pow(normal.x * normal.x + normal.y * normal.y + normal.z * normal.z, 0.5f); 
+        float length = (float) Math.pow(normal.x * normal.x + normal.y * normal.y + normal.z * normal.z, 0.5f);
         glNormal3f(normal.x / length, normal.y / length, normal.z / length);
     }
 
@@ -196,13 +231,28 @@ public class PelenNoise {
 
             calcNormal(vertices.get(k * 3 + 0), vertices.get(k * 3 + 1), vertices.get(k * 3 + 2));
 
-            glColor3f(vertices.get(k * 3 + 0).y, vertices.get(k * 3 + 0).y, vertices.get(k * 3 + 0).y);
+            //glColor3f(vertices.get(k * 3 + 0).y, vertices.get(k * 3 + 0).y, vertices.get(k * 3 + 0).y);
+            if ((float) (vertices.get(k * 3 + 0).y - lowPoint) / (hightPoint - lowPoint) > 0.90f) {
+                glTexCoord2f((float) (vertices.get(k * 3 + 0).y - lowPoint) / (hightPoint - lowPoint) - 0.1f, 0.5f);
+            } else {
+                glTexCoord2f((float) (vertices.get(k * 3 + 0).y - lowPoint) / (hightPoint - lowPoint), 0.5f);
+            }
             glVertex3f(vertices.get(k * 3 + 0).x, vertices.get(k * 3 + 0).y, vertices.get(k * 3 + 0).z);
 
-            glColor3f(vertices.get(k * 3 + 1).y, vertices.get(k * 3 + 1).y, vertices.get(k * 3 + 1).y);
+            //glColor3f(vertices.get(k * 3 + 1).y, vertices.get(k * 3 + 1).y, vertices.get(k * 3 + 1).y);
+            if ((float) (vertices.get(k * 3 + 1).y - lowPoint) / (hightPoint - lowPoint) > 0.90f) {
+                glTexCoord2f((float) (vertices.get(k * 3 + 1).y - lowPoint) / (hightPoint - lowPoint) - 0.1f, 0.5f);
+            } else {
+                glTexCoord2f((float) (vertices.get(k * 3 + 1).y - lowPoint) / (hightPoint - lowPoint), 0.5f);
+            }
             glVertex3f(vertices.get(k * 3 + 1).x, vertices.get(k * 3 + 1).y, vertices.get(k * 3 + 1).z);
 
-            glColor3f(vertices.get(k * 3 + 2).y, vertices.get(k * 3 + 2).y, vertices.get(k * 3 + 2).y);
+            //glColor3f(vertices.get(k * 3 + 2).y, vertices.get(k * 3 + 2).y, vertices.get(k * 3 + 2).y);
+            if ((float) (vertices.get(k * 3 + 2).y - lowPoint) / (hightPoint - lowPoint) > 0.90f) {
+                glTexCoord2f((float) (vertices.get(k * 3 + 2).y - lowPoint) / (hightPoint - lowPoint) - 0.1f, 0.5f);
+            } else {
+                glTexCoord2f((float) (vertices.get(k * 3 + 2).y - lowPoint) / (hightPoint - lowPoint), 0.5f);
+            }
             glVertex3f(vertices.get(k * 3 + 2).x, vertices.get(k * 3 + 2).y, vertices.get(k * 3 + 2).z);
         }
 

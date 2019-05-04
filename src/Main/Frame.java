@@ -39,6 +39,7 @@ public class Frame {
 
     private void InitGL() { // Выставляем настройки камеры, FOV, режимы отрисовки и тд.
         glMatrixMode(GL_PROJECTION);
+        glEnable(GL_TEXTURE_2D);
         glLoadIdentity();
         GLU.gluPerspective(45, (float) this.width / (float) this.height, 0.3f, 1000f);
         //glMatrixMode(GL_MODELVIEW);
