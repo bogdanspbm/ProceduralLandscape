@@ -35,8 +35,24 @@ public class Game {
         glTranslatef(-cam.getPos().x, -cam.getPos().y, -cam.getPos().z); // Ставлю координаты в пространтсве
         //demoter.drawModel(); // Отрисовка модели ( Загрузка выше ) (См класс Actor)
         if (Keyboard.isKeyDown(Keyboard.KEY_R)) {
-           terrain.refresh();
+            terrain.refresh();
         }
+        if (Keyboard.isKeyDown(Keyboard.KEY_1)) {
+            terrain.changeVarToChange(1);
+        }
+        if (Keyboard.isKeyDown(Keyboard.KEY_2)) {
+            terrain.changeVarToChange(2);
+        }
+        if (Keyboard.isKeyDown(Keyboard.KEY_3)) {
+            terrain.changeVarToChange(3);
+        }
+        if (Keyboard.isKeyDown(Keyboard.KEY_UP)) {
+            terrain.changeVar(0.1f);
+        }
+        if (Keyboard.isKeyDown(Keyboard.KEY_DOWN)) {
+            terrain.changeVar(-0.1f);
+        }
+
         //myTerrain.drawTerrain();
         terrain.drawTerrain();
         sky.drawSkyBox();

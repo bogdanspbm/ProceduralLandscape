@@ -13,10 +13,15 @@ import org.lwjgl.util.vector.Vector3f;
 public class PelenNoise {
 
     private List<Vector3f> vertices = new ArrayList<>();
-    private int cellCount = 50;
+    private int cellCount = 100;
     private Vector3f[][] verticesMatrix = new Vector3f[cellCount][cellCount];
-    private float scaler = 1;
+    private float scaler = 4;
+    private float defaultFreq = 0.15f;
+    private float defaultAmplitude = 2;
+    private float defaultPersis = 0.2f;
     private int NUM_OCTAVES = 50;
+    private int varToChange = 0;
+    float seed = (float) (Math.PI * 2 * 10 * (1 + Math.random()));
 
     public PelenNoise(int seed) {
         fillZerosVerticesMatrix();
@@ -24,8 +29,33 @@ public class PelenNoise {
         fillVericexArray();
     }
 
+    public void changeVar(float toAdd) {
+        switch (varToChange) {
+            case 1:
+                defaultFreq += toAdd;
+                break;
+            case 2:
+                defaultAmplitude += toAdd;
+                break;
+            case 3:
+                defaultPersis += toAdd;
+                break;
+        }
+
+        System.out.println(defaultAmplitude + " Amplitude");
+        System.out.println(defaultFreq + " Freq");
+        System.out.println(defaultPersis + " Persis");
+
+        refresh();
+    }
+
+    public void changeVarToChange(int mode) {
+        varToChange = mode;
+    }
+
     public void refresh() {
         vertices = new ArrayList<>();
+        seed = (float) (Math.PI * 2 * 10 * (1 + Math.random()));
         fillZerosVerticesMatrix();
         genNoise();
         fillVericexArray();
@@ -70,12 +100,12 @@ public class PelenNoise {
         float total = 0;
         // это число может иметь и другие значения хоть cosf(sqrtf(2))*3.14f 
         // главное чтобы было красиво и результат вас устраивал
-        float persistence = 0.5f;
+        float persistence = defaultPersis;
 
         // экспериментируйте с этими значениями, попробуйте ставить 
         // например sqrtf(3.14f)*0.25f или что-то потяжелее для понимания J)
-        float frequency = 0.25f;
-        float amplitude = 1;//амплитуда, в прямой зависимости от значения настойчивости
+        float frequency = defaultFreq;
+        float amplitude = defaultAmplitude;//амплитуда, в прямой зависимости от значения настойчивости
 
         // вводим фактор случайности, чтобы облака не были всегда одинаковыми
         // (Мы ведь помним что ф-ция шума когерентна?) 
@@ -87,7 +117,7 @@ public class PelenNoise {
         for (int i = 0; i < NUM_OCTAVES; i++) {
             total += compileNoise(x * frequency, y * frequency) * amplitude;
             amplitude *= persistence;
-            frequency *= 2;
+            frequency *= Math.E;
         }
 
         total += 1;
@@ -99,7 +129,7 @@ public class PelenNoise {
     private void genNoise() {
         // случайное число, которое призвано внести
         // случайность в нашу текстуру
-        float fac = (float) (Math.PI * 2 * 10 * (1 + Math.random()));
+        float fac = seed;
 
         for (int i = 0; i < cellCount; i++) {
             for (int j = 0; j < cellCount; j++) {
@@ -153,7 +183,8 @@ public class PelenNoise {
         Vector3f a = new Vector3f(s2.x - s1.x, s2.y - s1.y, s2.z - s1.z);
         Vector3f b = new Vector3f(s3.x - s2.x, s3.y - s2.y, s3.z - s2.z);
         Vector3f normal = new Vector3f(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x);
-        glNormal3f(normal.x, normal.y, normal.z);
+        float length = (float)Math.pow(normal.x * normal.x + normal.y * normal.y + normal.z * normal.z, 0.5f); 
+        glNormal3f(normal.x / length, normal.y / length, normal.z / length);
     }
 
     public void drawTerrain() {
@@ -177,7 +208,6 @@ public class PelenNoise {
 
         glEnd();
 
-        //drawDemoOcean();
     }
 
 }
