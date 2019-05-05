@@ -13,7 +13,7 @@ public class Game {
 
     public final Camera cam;
     //private final Terrain myTerrain;
-    private Actor demoter = new Actor("res/models/landscape.obj"); // Загрузка модели
+    private Actor demoter = new Actor("res/models/testcube.obj", "res/textures/cube.bmp"); // Загрузка модели
     private SkyBox sky = new SkyBox("res/textures/day_skybox.png");
     private PelenNoise terrain = new PelenNoise(100);
     //private Terrain terrain = new Terrain();
@@ -54,9 +54,8 @@ public class Game {
             //terrain.changeVar(-0.1f);
         }
 
-        //myTerrain.drawTerrain();
+        demoter.drawModel();
         terrain.drawTerrain();
         sky.drawSkyBox();
-        //sea.drawSea(0.1f);
     }
 }

@@ -242,6 +242,7 @@ public final class PelenNoise {
 
     public void drawTerrain() {
         // Эта функция отрисует все твои клетки
+        gradient.bind();
         glEnable(GL_TEXTURE_2D);
         glBegin(GL_TRIANGLES);
 
@@ -256,8 +257,8 @@ public final class PelenNoise {
         }
 
         glEnd();
-
         glDisable(GL_TEXTURE_2D);
+        //gradient.release();
     }
 
 }

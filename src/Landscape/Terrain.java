@@ -59,8 +59,8 @@ public class Terrain {
         for (int i = 0; i < cellCount; i++) {
             verticesMatrix[0][i].y = 0;
             verticesMatrix[i][0].y = 0;
-            verticesMatrix[cellCount-1][i].y = 0;
-            verticesMatrix[i][cellCount-1].y = 0;
+            verticesMatrix[cellCount - 1][i].y = 0;
+            verticesMatrix[i][cellCount - 1].y = 0;
         }
     }
 
@@ -296,9 +296,9 @@ public class Terrain {
 
     public void drawTerrain() {
         // Эта функция отрисует все твои клетки
+        gradient.bind();
         glEnable(GL_TEXTURE_2D);
         glBegin(GL_TRIANGLES);
-        gradient.bind();
 
         for (int k = 0; k < vertices.size() / 3; k += 1) {
 
@@ -330,7 +330,7 @@ public class Terrain {
 
         glEnd();
         GL11.glDisable(GL_TEXTURE_2D);
-
+        gradient.release();
         sea.drawSea(0.006f);
     }
 }
