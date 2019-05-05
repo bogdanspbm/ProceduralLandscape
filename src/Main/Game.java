@@ -1,6 +1,7 @@
 package Main;
 
 import Actors.StaticMesh;
+import Landscape.LowPolyTerrain;
 import Landscape.PelenNoise;
 import Utils3D.Draw3D;
 import org.lwjgl.input.Keyboard;
@@ -11,11 +12,13 @@ public class Game {
 
     public final Camera cam;
     private StaticMesh skySphere = new StaticMesh("res/models/sky.obj", "res/textures/T_Skybox_No_Snow_Diff.tga"); // Загрузка модели
+    private LowPolyTerrain landscape = new LowPolyTerrain();
     private PelenNoise noise = new PelenNoise();
     int i = 0;
 
     public Game() {
         cam = new Camera(20, 20, 20); // Cоздаем камеру с координатами x=0, y = 1, z = 5;
+        skySphere.addCopy(0, 200, 0);
 
     }
 
@@ -32,8 +35,8 @@ public class Game {
         if (Keyboard.isKeyDown(Keyboard.KEY_R)) { // Обновляю шум
             noise.refresh();
         }
-        
+
         skySphere.drawModel();
-        Draw3D.matrixToFlat(noise.getNoiseMat(), noise.getSize());
+        landscape.matrixToLandscape(noise.getNoiseMat(), noise.getSize());
     }
 }

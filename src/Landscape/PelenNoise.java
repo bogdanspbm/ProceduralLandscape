@@ -5,7 +5,7 @@ import org.lwjgl.util.vector.Vector3f;
 
 public final class PelenNoise {
 
-    private int cellCount = 100;
+    private int cellCount = 130;
     private Vector3f[][] verticesMatrix = new Vector3f[cellCount][cellCount];
     private float scaler = 0.25f;
     private float defaultFreq = 0.15f;
