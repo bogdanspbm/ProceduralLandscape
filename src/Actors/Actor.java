@@ -28,6 +28,7 @@ public class Actor {
     private Model m = null;
     Texture texture;
     private boolean hasText = false;
+    private float x0 = 0, y0 = 200, z0 = 0;
 
     public Actor(String fileName, String fileName2) {
         try {
@@ -46,6 +47,7 @@ public class Actor {
             hasText = true;
         } catch (IOException ex) {
             System.out.print("Can't load texture");
+            ex.printStackTrace();
         }
     }
 
@@ -64,7 +66,7 @@ public class Actor {
                 glTexCoord2f(t1.x, t1.y);
             }
             Vector3f v1 = m.getVertices().get(face.getVertexIndices()[0] - 1);
-            glVertex3f(v1.x, v1.y, v1.z);
+            glVertex3f(v1.x + x0, v1.y + y0, v1.z + z0);
 
             // Вторая точка
             Vector3f n2 = m.getNormals().get(face.getNormalIndices()[1] - 1);
@@ -74,7 +76,7 @@ public class Actor {
                 glTexCoord2f(t2.x, t2.y);
             }
             Vector3f v2 = m.getVertices().get(face.getVertexIndices()[1] - 1);
-            glVertex3f(v2.x, v2.y, v2.z);
+            glVertex3f(v2.x + x0, v2.y + y0, v2.z + z0);
 
             //Третья точка
             Vector3f n3 = m.getNormals().get(face.getNormalIndices()[2] - 1);
@@ -84,7 +86,7 @@ public class Actor {
                 glTexCoord2f(t3.x, t3.y);
             }
             Vector3f v3 = m.getVertices().get(face.getVertexIndices()[2] - 1);
-            glVertex3f(v3.x, v3.y, v3.z);
+            glVertex3f(v3.x + x0, v3.y + y0, v3.z + z0);
         }
         glEnd();
         glDisable(GL_TEXTURE_2D);
