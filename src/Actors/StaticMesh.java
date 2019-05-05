@@ -1,12 +1,9 @@
 package Actors;
 
-import Landscape.SkyBox;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.lwjgl.opengl.Display;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
@@ -23,14 +20,14 @@ import org.lwjgl.util.vector.Vector3f;
 import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureLoader;
 
-public class Actor {
+public class StaticMesh {
 
     private Model m = null;
     Texture texture;
     private boolean hasText = false;
     private float x0 = 0, y0 = 200, z0 = 0;
 
-    public Actor(String fileName, String fileName2) {
+    public StaticMesh(String fileName, String fileName2) {
         try {
             m = OBJLoader.loadTexturedModel(new File(fileName));
         } catch (FileNotFoundException e) {

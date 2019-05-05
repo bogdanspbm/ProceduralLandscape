@@ -1,29 +1,10 @@
 package Landscape;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
-import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
-import static org.lwjgl.opengl.GL11.glBegin;
-import static org.lwjgl.opengl.GL11.glColor3f;
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glEnd;
-import static org.lwjgl.opengl.GL11.glNormal3f;
-import static org.lwjgl.opengl.GL11.glTexCoord2f;
-import static org.lwjgl.opengl.GL11.glVertex3f;
+import static Utils3D.Draw3D.matrixToFlat;
 import org.lwjgl.util.vector.Vector3f;
-import org.newdawn.slick.opengl.Texture;
-import org.newdawn.slick.opengl.TextureLoader;
 
 public final class PelenNoise {
 
-    private List<Vector3f> vertices = new ArrayList<>();
     private int cellCount = 100;
     private Vector3f[][] verticesMatrix = new Vector3f[cellCount][cellCount];
     private float scaler = 0.25f;
@@ -32,54 +13,17 @@ public final class PelenNoise {
     private float defaultPersis = 0.2f;
     private int inum = 1;
     private int NUM_OCTAVES = 50;
-    private int varToChange = 0;
     float seed = (float) (Math.PI * 2 * 10 * (1 + Math.random()));
     private float lowPoint = 10000, hightPoint = -10000;
-    String filePath = "res/textures/gradient.png";
-    Texture gradient;
 
-    public PelenNoise(int seed) {
-
-        try {
-            gradient = TextureLoader.getTexture("PNG", new FileInputStream(new File(filePath)));
-        } catch (IOException ex) {
-            System.out.print("Can't load texture");
-            Logger.getLogger(SkyBox.class.getName()).log(Level.SEVERE, null, ex);
-            System.exit(0);
-        }
+    public PelenNoise() {
         refresh();
-    }
-
-    public void changeVar(float toAdd) {
-        switch (varToChange) {
-            case 1:
-                defaultFreq += toAdd;
-                break;
-            case 2:
-                defaultAmplitude += toAdd;
-                break;
-            case 3:
-                defaultPersis += toAdd;
-                break;
-        }
-
-        System.out.println(defaultAmplitude + " Amplitude");
-        System.out.println(defaultFreq + " Freq");
-        System.out.println(defaultPersis + " Persis");
-
-        refresh();
-    }
-
-    public void changeVarToChange(int mode) {
-        varToChange = mode;
     }
 
     public void refresh() {
-        vertices = new ArrayList<>();
         inum = getIPrime((int) (Math.random() * 19));
         fillZerosVerticesMatrix();
         genNoise();
-        fillVericexArray();
         getHightAndLow();
     }
 
@@ -175,7 +119,7 @@ public final class PelenNoise {
     }
 
     private void getHightAndLow() {
-        float h = 0;
+        float h;
         lowPoint = 10000;
         hightPoint = -10000;
         for (int i = 0; i < cellCount; i++) {
@@ -195,70 +139,20 @@ public final class PelenNoise {
         for (int i = 0; i < cellCount; i++) {
             for (int k = 0; k < cellCount; k++) {
                 verticesMatrix[i][k] = new Vector3f((float) (i - cellCount / 2) / scaler, (float) 0, (float) (k - cellCount / 2) / scaler);
-                // i и k в данном случае координаты 
-                // по идеи можно поменять систему счисления тем самым уменьшив размер поля и уменьшить полигоны
-                // как вариант поделив на const
             }
         }
     }
 
-    private void fillVericexArray() {
-        for (int i = 0; i < cellCount - 1; i++) {
-            for (int k = 0; k < cellCount - 1; k++) {
-                fillCell(verticesMatrix[i][k], verticesMatrix[i + 1][k], verticesMatrix[i + 1][k + 1], verticesMatrix[i][k + 1]);
-            }
-        }
-    }
-
-    private void fillCell(Vector3f a, Vector3f b, Vector3f c, Vector3f d) {
-
-        // Делю клетку на два треугольника и добавляю их в очередь для отрисовки
-        vertices.add(d);
-        vertices.add(c);
-        vertices.add(b);
-
-        vertices.add(a);
-        vertices.add(d);
-        vertices.add(b);
-
-    }
-
-    public void calcNormal(Vector3f s1, Vector3f s2, Vector3f s3) {
-        Vector3f a = new Vector3f(s2.x - s1.x, s2.y - s1.y, s2.z - s1.z);
-        Vector3f b = new Vector3f(s3.x - s2.x, s3.y - s2.y, s3.z - s2.z);
-        Vector3f normal = new Vector3f(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x);
-        float length = (float) Math.pow(normal.x * normal.x + normal.y * normal.y + normal.z * normal.z, 0.5f);
-        glNormal3f(normal.x / length, normal.y / length, normal.z / length);
-    }
-
-    private void setVertexWithColor(int num) {
-        if ((float) (vertices.get(num).y - lowPoint) / (hightPoint - lowPoint) > 0.95f) {
-            glTexCoord2f((float) (vertices.get(num).y - lowPoint) / (hightPoint - lowPoint) - 0.05f, 0.5f);
-        } else {
-            glTexCoord2f((float) (vertices.get(num).y - lowPoint) / (hightPoint - lowPoint), 0.5f);
-        }
-        glVertex3f(vertices.get(num).x, vertices.get(num).y, vertices.get(num).z);
+    public Vector3f[][] getNoiseMat() {
+        return verticesMatrix;
     }
 
     public void drawTerrain() {
-        // Эта функция отрисует все твои клетки
-        gradient.bind();
-        glEnable(GL_TEXTURE_2D);
-        glBegin(GL_TRIANGLES);
+        matrixToFlat(verticesMatrix, cellCount);
+    }
 
-        for (int k = 0; k < vertices.size() / 3; k += 1) {
-
-            calcNormal(vertices.get(k * 3 + 0), vertices.get(k * 3 + 1), vertices.get(k * 3 + 2));
-
-            setVertexWithColor(k * 3 + 0);
-            setVertexWithColor(k * 3 + 1);
-            setVertexWithColor(k * 3 + 2);
-
-        }
-
-        glEnd();
-        glDisable(GL_TEXTURE_2D);
-        //gradient.release();
+    public int getSize() {
+        return cellCount;
     }
 
 }
