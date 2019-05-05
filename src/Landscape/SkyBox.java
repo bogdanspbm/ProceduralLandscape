@@ -22,6 +22,7 @@ import org.newdawn.slick.opengl.TextureLoader;
 public class SkyBox {
 
     Texture skytext;
+    private float z0 = 150;
 
     public SkyBox(String filePath) {
         try {
@@ -42,43 +43,43 @@ public class SkyBox {
         glNormal3f(0, 0, 1);
 
         //glTexCoord2f(1,0);
-        glVertex3f(10000, -10000, -10000);
+        glVertex3f(200, -200 + z0, -200);
         //glTexCoord2f(1,1);
-        glVertex3f(10000, 10000, -10000);
+        glVertex3f(200, 200 + z0, -200);
         // glTexCoord2f(0,1);
-        glVertex3f(-10000, 10000, -10000);
+        glVertex3f(-200, 200 + z0, -200);
         // glTexCoord2f(0,0);
-        glVertex3f(-1000, -10000, -10000);
+        glVertex3f(-200, -200 + z0, -200);
 
         glNormal3f(0, 0, -1);
-        glVertex3f(-10000, -10000, 10000);
-        glVertex3f(-10000, 10000, 10000);
-        glVertex3f(10000, 10000, 10000);
-        glVertex3f(10000, -10000, 10000);
+        glVertex3f(-200, -200 + z0, 200);
+        glVertex3f(-200, 200 + z0, 200);
+        glVertex3f(200, 200 + z0, 200);
+        glVertex3f(200, -200 + z0, 200);
 
         glNormal3f(0, -1, 0);
-        glVertex3f(10000, 10000, -10000);
-        glVertex3f(10000, 10000, 10000);
-        glVertex3f(-10000, 10000, 10000);
-        glVertex3f(-10000, 10000, -10000);
+        glVertex3f(200, 200 + z0, -200);
+        glVertex3f(200, 200 + z0, 200);
+        glVertex3f(-200, 200 + z0, 200);
+        glVertex3f(-200, 200 + z0, -200);
 
         glNormal3f(0, 1, 0);
-        glVertex3f(-10000, -10000, -10000);
-        glVertex3f(-10000, -10000, 10000);
-        glVertex3f(10000, -10000, 10000);
-        glVertex3f(10000, -10000, -10000);
+        glVertex3f(-200, -200 + z0, -200);
+        glVertex3f(-200, -200 + z0, 200);
+        glVertex3f(200, -200 + z0, 200);
+        glVertex3f(200, -200 + z0, -200);
 
         glNormal3f(1, 0, 0);
-        glVertex3f(-10000, 10000, -10000);
-        glVertex3f(-10000, 10000, 10000);
-        glVertex3f(-10000, -10000, 10000);
-        glVertex3f(-10000, -10000, -10000);
+        glVertex3f(-200, 200 + z0, -200);
+        glVertex3f(-200, 200 + z0, 200);
+        glVertex3f(-200, -200 + z0, 200);
+        glVertex3f(-200, -200 + z0, -200);
 
         glNormal3f(-1, 0, 0);
-        glVertex3f(10000, -10000, -10000);
-        glVertex3f(10000, -10000, 10000);
-        glVertex3f(10000, 10000, 10000);
-        glVertex3f(10000, 10000, -10000);
+        glVertex3f(200, -200 + z0, -200);
+        glVertex3f(200, -200 + z0, 200);
+        glVertex3f(200, 200 + z0, 200);
+        glVertex3f(200, 200 + z0, -200);
 
         glEnd();
     }

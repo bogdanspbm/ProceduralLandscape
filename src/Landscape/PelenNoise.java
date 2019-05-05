@@ -28,7 +28,7 @@ public final class PelenNoise {
     private Vector3f[][] verticesMatrix = new Vector3f[cellCount][cellCount];
     private float scaler = 0.25f;
     private float defaultFreq = 0.15f;
-    private float defaultAmplitude = 16f;
+    private float defaultAmplitude = 4f;
     private float defaultPersis = 0.2f;
     private int inum = 1;
     private int NUM_OCTAVES = 50;
@@ -161,7 +161,7 @@ public final class PelenNoise {
         for (int i = 0; i < cellCount; i++) {
             for (int j = 0; j < cellCount; j++) {
                 //проходим по всем элементам массива и заполняем их значениями   
-                verticesMatrix[i][j].y = 4f * perlinNoise2D((float) i, (float) j, fac);
+                verticesMatrix[i][j].y = 4f * perlinNoise2D((float) i, (float) j, fac) / scaler;
             }
         }
     }
