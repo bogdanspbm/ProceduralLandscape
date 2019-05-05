@@ -10,6 +10,7 @@ import java.nio.FloatBuffer;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.*;
+import utility.BufferTools;
 
 /**
  * @author Oskar
@@ -136,7 +137,6 @@ public class OBJLoader {
         return m;
     }
 
-    /*
     public static int createTexturedDisplayList(Model m) {
         int displayList = glGenLists(1);
         glNewList(displayList, GL_COMPILE);
@@ -191,7 +191,7 @@ public class OBJLoader {
         }
         glEndList();
         return displayList;
-    }*/
+    }
 
     public static Model loadTexturedModel(File f) throws IOException {
         BufferedReader reader = new BufferedReader(new FileReader(f));
