@@ -13,7 +13,7 @@ public class Game {
 
     public final Camera cam;
     //private final Terrain myTerrain;
-    private Actor demoter = new Actor("res/models/testcube.obj", "res/textures/cube.bmp"); // Загрузка модели
+    private Actor demoter = new Actor("res/models/Tree.obj", "res/textures/T_PolygonNature_01.tga"); // Загрузка модели
     private SkyBox sky = new SkyBox("res/textures/day_skybox.png");
     private PelenNoise terrain = new PelenNoise(100);
     //private Terrain terrain = new Terrain();

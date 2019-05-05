@@ -42,7 +42,7 @@ public class Actor {
             System.exit(1);
         }
         try {
-            texture = TextureLoader.getTexture("bmp", new FileInputStream(new File(fileName2)));
+            texture = TextureLoader.getTexture("tga", new FileInputStream(new File(fileName2)));
             hasText = true;
         } catch (IOException ex) {
             System.out.print("Can't load texture");
@@ -62,7 +62,6 @@ public class Actor {
             if (m.hasTextureCoordinates() && hasText) {
                 Vector2f t1 = m.getTextureCoordinates().get(face.getTextureCoordinateIndices()[0] - 1);
                 glTexCoord2f(t1.x, t1.y);
-                System.out.println(t1);
             }
             Vector3f v1 = m.getVertices().get(face.getVertexIndices()[0] - 1);
             glVertex3f(v1.x, v1.y, v1.z);
@@ -73,7 +72,6 @@ public class Actor {
             if (m.hasTextureCoordinates() && hasText) {
                 Vector2f t2 = m.getTextureCoordinates().get(face.getTextureCoordinateIndices()[1] - 1);
                 glTexCoord2f(t2.x, t2.y);
-                System.out.println(t2);
             }
             Vector3f v2 = m.getVertices().get(face.getVertexIndices()[1] - 1);
             glVertex3f(v2.x, v2.y, v2.z);
@@ -84,7 +82,6 @@ public class Actor {
             if (m.hasTextureCoordinates() && hasText) {
                 Vector2f t3 = m.getTextureCoordinates().get(face.getTextureCoordinateIndices()[2] - 1);
                 glTexCoord2f(t3.x, t3.y);
-                System.out.println(t3);
             }
             Vector3f v3 = m.getVertices().get(face.getVertexIndices()[2] - 1);
             glVertex3f(v3.x, v3.y, v3.z);

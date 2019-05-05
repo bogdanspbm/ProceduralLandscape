@@ -11,7 +11,7 @@ public class Frame {
 
     private int width, height; // Размеры окна 
     private Game game; // Клас в котором все что связано с миром
-    private static float[] lightPosition = {-20.19f, 100.36f, 110.45f, 1f};
+    private static float[] lightPosition = {40.19f, 100.36f, -10.45f, 2f};
 
     public Frame() { // Конструктор
         this.width = Display.getWidth();

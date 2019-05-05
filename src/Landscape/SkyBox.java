@@ -25,13 +25,13 @@ public class SkyBox {
     private float z0 = 150;
 
     public SkyBox(String filePath) {
-        try {
+       /* try {
             skytext = TextureLoader.getTexture("PNG", new FileInputStream(new File(filePath)));
         } catch (IOException ex) {
             System.out.print("Can't load texture");
             Logger.getLogger(SkyBox.class.getName()).log(Level.SEVERE, null, ex);
             System.exit(0);
-        }
+        }*/
     }
 
     public void drawSkyBox() {
