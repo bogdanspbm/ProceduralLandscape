@@ -1,6 +1,7 @@
 package Main;
 
 import Actors.StaticMesh;
+import Landscape.LowPolyOcean;
 import Landscape.LowPolyTerrain;
 import Landscape.PelenNoise;
 import Utils3D.Draw3D;
@@ -13,6 +14,7 @@ public class Game {
     public final Camera cam;
     private StaticMesh skySphere = new StaticMesh("res/models/sky.obj", "res/textures/T_Skybox_No_Snow_Diff.tga"); // Загрузка модели
     private LowPolyTerrain landscape = new LowPolyTerrain();
+    private LowPolyOcean ocean = new LowPolyOcean();
     private PelenNoise noise = new PelenNoise();
     int i = 0;
 
@@ -38,5 +40,6 @@ public class Game {
 
         skySphere.drawModel();
         landscape.matrixToLandscape(noise.getNoiseMat(), noise.getSize());
+        ocean.drawOcean(noise.getNoiseMat());
     }
 }

@@ -65,18 +65,6 @@ public class LowPolyTerrain {
         return textCoords;
     }
 
-    private void drawWater() {
-        glBegin(GL_QUADS);
-        glColor4f(0.7f, 0.9f, 0.9f, 0.5f);
-        glNormal3f(0, 1, 0);
-        glVertex3f(-500f, waterLevel, -500f);
-        glVertex3f(-500f, waterLevel, 500f);
-        glVertex3f(500f, waterLevel, 500f);
-        glVertex3f(500f, waterLevel, -500f);
-        glEnd();
-
-    }
-
     private static Vector2f[] selectRandomGray() {
         Vector2f[] textCoords = new Vector2f[3];
         int caseNum = (int) (Math.random() * 0);
@@ -153,13 +141,13 @@ public class LowPolyTerrain {
         float normalDegree = getVectorWorldDegree(calcNormal(mat[x][y], mat[x + 1][y], mat[x + 1][y + 1]));
         if (normalDegree - 2 < 0.7f) {
             res = false;
-            System.out.println("Bad degree " + normalDegree);
+            //System.out.println("Bad degree " + normalDegree);
             return res;
         }
-        
+
         if ((mat[x][y].y + mat[x + 1][y].y + mat[x + 1][y + 1].y) / 3 < waterLevel + 2f) {
             res = false;
-            System.out.println("Bad water level " + (mat[x][y].y + mat[x + 1][y].y + mat[x + 1][y + 1].y) / 3);
+            //System.out.println("Bad water level " + (mat[x][y].y + mat[x + 1][y].y + mat[x + 1][y + 1].y) / 3);
             return res;
         }
 
@@ -174,11 +162,10 @@ public class LowPolyTerrain {
                 x = (int) (Math.random() * (size - 2));
                 y = (int) (Math.random() * (size - 2));
                 a = mat[x][y + 1];
-                b = mat[x + 1][y+1];
+                b = mat[x + 1][y + 1];
                 c = mat[x][y + 1];
                 if (canPlaceTree(mat, x, y)) {
                     tree.addCopy((a.x + b.x + c.x) / 3, (a.y + b.y + c.y) / 3, (a.z + b.z + c.z) / 3);
-                    System.out.println("good");
                 } else {
                     ///System.out.println("can't place");
                 }
@@ -189,7 +176,7 @@ public class LowPolyTerrain {
 
     public void matrixToLandscape(Vector3f[][] mat, int size) {
 
-        generateTrees(mat, 10000, size);
+        //generateTrees(mat, 10000, size);
         terrainColors.bind();
         glEnable(GL_TEXTURE_2D);
         glBegin(GL_TRIANGLES);
@@ -201,8 +188,7 @@ public class LowPolyTerrain {
         }
         glEnd();
         glDisable(GL_TEXTURE_2D);
-        drawWater();
-        tree.drawModel();
+        //tree.drawModel();
     }
 
 }
