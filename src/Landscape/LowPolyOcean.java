@@ -14,7 +14,7 @@ import org.lwjgl.util.vector.Vector3f;
 
 public class LowPolyOcean {
 
-    private static int size = 130;
+    private static int size = 150;
     private float scaler = 2;
     private float waterLevel = -4f;
     private float[][] waterPoly = new float[size][size];
@@ -57,7 +57,7 @@ public class LowPolyOcean {
         if ((a.y + b.y + c.y + d.y) / 4 < waterLevel) {
             glColor4f(0.8f, 0.95f, 0.95f, 0.3f);
         } else {
-            glColor4f(0.97f, 0.97f, 0.97f, 0.5f);
+            glColor4f(0.8f, 0.97f, 0.8f, 0.5f);
         }
     }
 

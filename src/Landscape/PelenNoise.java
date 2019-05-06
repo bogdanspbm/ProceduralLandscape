@@ -5,16 +5,15 @@ import org.lwjgl.util.vector.Vector3f;
 
 public final class PelenNoise {
 
-    private int cellCount = 130;
+    private int cellCount = 150;
     private Vector3f[][] verticesMatrix = new Vector3f[cellCount][cellCount];
     private float scaler = 0.25f;
     private float defaultFreq = 0.15f;
-    private float defaultAmplitude = 4f;
+    private float defaultAmplitude = 8f;
     private float defaultPersis = 0.2f;
     private int inum = 1;
     private int NUM_OCTAVES = 50;
     float seed = (float) (Math.PI * 2 * 10 * (1 + Math.random()));
-    private float lowPoint = 10000, hightPoint = -10000;
 
     public PelenNoise() {
         refresh();
@@ -24,7 +23,6 @@ public final class PelenNoise {
         inum = getIPrime((int) (Math.random() * 19));
         fillZerosVerticesMatrix();
         genNoise();
-        getHightAndLow();
     }
 
     private int getIPrime(int i) {
@@ -105,7 +103,7 @@ public final class PelenNoise {
         for (int i = 0; i < cellCount; i++) {
             for (int j = 0; j < cellCount; j++) {
                 //проходим по всем элементам массива и заполняем их значениями   
-                verticesMatrix[i][j].y = 4f * perlinNoise2D((float) i, (float) j, fac) / scaler;
+                verticesMatrix[i][j].y = 4f * perlinNoise2D((float) i / 2, (float) j / 2, fac) / scaler;
             }
         }
     }
@@ -118,23 +116,7 @@ public final class PelenNoise {
         return a + (b - a) * t;
     }
 
-    private void getHightAndLow() {
-        float h;
-        lowPoint = 10000;
-        hightPoint = -10000;
-        for (int i = 0; i < cellCount; i++) {
-            for (int k = 0; k < cellCount; k++) {
-                h = verticesMatrix[i][k].y;
-                if (h < lowPoint) {
-                    lowPoint = h;
-                }
-                if (h > hightPoint) {
-                    hightPoint = h;
-                }
-            }
-        }
-    }
-
+ 
     private void fillZerosVerticesMatrix() {
         for (int i = 0; i < cellCount; i++) {
             for (int k = 0; k < cellCount; k++) {
