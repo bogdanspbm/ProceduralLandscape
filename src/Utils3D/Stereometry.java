@@ -19,4 +19,8 @@ public class Stereometry {
         return result;
     }
 
+    public static float getVectorLenght(Vector3f a, Vector3f b) {
+        return (float) (Math.sqrt((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y) + (a.z - b.z) * (a.z - b.z)));
+    }
+
 }

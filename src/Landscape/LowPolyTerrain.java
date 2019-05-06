@@ -1,6 +1,7 @@
 package Landscape;
 
 import Actors.StaticMesh;
+import Main.Camera;
 import static Utils3D.Stereometry.calcNormal;
 import static Utils3D.Stereometry.getVectorWorldDegree;
 import java.io.File;
@@ -26,10 +27,12 @@ public class LowPolyTerrain {
 
     private Texture terrainColors;
     private String texturePath = "res/textures/T_PolygonNature_01.tga";
-    private StaticMesh tree = new StaticMesh("res/models/Tree.obj", "res/textures/T_PolygonNature_01.tga");
+    String[] treePath = {"res/models/Tree.obj","res/models/TreeLod.obj"};
+    private StaticMesh tree = new StaticMesh(treePath, "res/textures/T_PolygonNature_01.tga");
     private float seed;
     private boolean bGeneratedTrees = false;
     private static float waterLevel = 0.6f;
+    private Camera cam;
 
     public LowPolyTerrain() {
         try {
@@ -40,6 +43,10 @@ public class LowPolyTerrain {
         }
 
         seed = (float) (Math.PI * 2 * 10 * (1 + Math.random()));
+    }
+
+    public void setCamera(Camera cam) {
+        this.cam = cam;
     }
 
     private static Vector2f[] selectRandomGreen() {
@@ -176,7 +183,7 @@ public class LowPolyTerrain {
 
     public void matrixToLandscape(Vector3f[][] mat, int size) {
 
-        //generateTrees(mat, 10000, size);
+        generateTrees(mat, 10000, size);
         terrainColors.bind();
         glEnable(GL_TEXTURE_2D);
         glBegin(GL_TRIANGLES);
@@ -188,7 +195,7 @@ public class LowPolyTerrain {
         }
         glEnd();
         glDisable(GL_TEXTURE_2D);
-        //tree.drawModel();
+        tree.drawModel(cam.getPos());
     }
 
 }
