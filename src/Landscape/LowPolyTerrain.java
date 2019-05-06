@@ -193,6 +193,7 @@ public class LowPolyTerrain {
         terrainColors.bind();
         glEnable(GL_TEXTURE_2D);
         glBegin(GL_TRIANGLES);
+        glColor4f(1, 1, 1, 1);
 
         for (int i = 0; i < size - 1; i++) {
             for (int k = 0; k < size - 1; k++) {

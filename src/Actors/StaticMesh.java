@@ -97,6 +97,7 @@ public class StaticMesh {
     public void drawModel() {
         for (int i = 0; i < count; i++) {
 
+            glPushMatrix();
             glTranslated(copies[i].x, copies[i].y, copies[i].z);
             glRotatef(rotations[i], 0, 1, 0);
 
@@ -139,8 +140,8 @@ public class StaticMesh {
             }
             glEnd();
             glDisable(GL_TEXTURE_2D);
-            glRotatef(-rotations[i], 0, 1, 0);
             glTranslated(-copies[i].x, -copies[i].y, -copies[i].z);
+            glPopMatrix();
         }
 
     }
@@ -154,6 +155,7 @@ public class StaticMesh {
             glRotatef(rotations[i], 0, 1, 0);
 
             texture.bind();
+            glColor4f(1, 1, 1, 1);
             glEnable(GL_TEXTURE_2D);
             glBegin(GL_TRIANGLES);
 
@@ -196,8 +198,8 @@ public class StaticMesh {
             }
             glEnd();
             glDisable(GL_TEXTURE_2D);
-            glRotatef(-rotations[i], 0, 1, 0);
             glTranslated(-copies[i].x, -copies[i].y, -copies[i].z);
+            glPopMatrix();
         }
 
     }
