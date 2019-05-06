@@ -26,7 +26,7 @@ public class Frame {
 
     public void render() { // Событие обработки кадров
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Чистим буферы из памяти карточки
-        glClearColor(0.84f, 0.894f, 0.901f, 1f);
+        glClearColor(0.925f, 0.98f, 0.988f, 1f);
 
         // Закидываем сюда новые модели. Вся отрисовка между Push и Pop Матрицами
         glPushMatrix();
@@ -47,7 +47,6 @@ public class Frame {
         setUpLighting();
 
     }
-    
 
     private static void setUpLighting() {
         glShadeModel(GL_SMOOTH);

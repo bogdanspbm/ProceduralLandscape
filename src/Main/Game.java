@@ -21,6 +21,7 @@ public class Game {
     public Game() {
         cam = new Camera(20, 20, 20); // Cоздаем камеру с координатами x=0, y = 1, z = 5;
         skySphere.addCopy(0, 200, 0);
+        skySphere.setScale(2f);
 
     }
 

@@ -28,6 +28,7 @@ public class StaticMesh {
     private int count = 0;
     private int maxCount = 10000;
     private Vector3f[] copies = new Vector3f[maxCount];
+    private float scale = 1f;
 
     public StaticMesh(String fileName, String fileName2) {
         try {
@@ -57,6 +58,10 @@ public class StaticMesh {
         }
     }
 
+    public void setScale(float sc) {
+        scale = sc;
+    }
+
     public void drawModel() {
         texture.bind();
         glEnable(GL_TEXTURE_2D);
@@ -73,7 +78,7 @@ public class StaticMesh {
                     glTexCoord2f(t1.x, t1.y);
                 }
                 Vector3f v1 = m.getVertices().get(face.getVertexIndices()[0] - 1);
-                glVertex3f(v1.x + copies[i].x, v1.y + copies[i].y, v1.z + copies[i].z);
+                glVertex3f(v1.x * scale + copies[i].x, v1.y * scale + copies[i].y, v1.z * scale + copies[i].z);
 
                 // Вторая точка
                 Vector3f n2 = m.getNormals().get(face.getNormalIndices()[1] - 1);
@@ -83,7 +88,7 @@ public class StaticMesh {
                     glTexCoord2f(t2.x, t2.y);
                 }
                 Vector3f v2 = m.getVertices().get(face.getVertexIndices()[1] - 1);
-                glVertex3f(v2.x + copies[i].x, v2.y + copies[i].y, v2.z + copies[i].z);
+                glVertex3f(v2.x * scale + copies[i].x, v2.y * scale + copies[i].y, v2.z * scale + copies[i].z);
 
                 //Третья точка
                 Vector3f n3 = m.getNormals().get(face.getNormalIndices()[2] - 1);
@@ -93,7 +98,7 @@ public class StaticMesh {
                     glTexCoord2f(t3.x, t3.y);
                 }
                 Vector3f v3 = m.getVertices().get(face.getVertexIndices()[2] - 1);
-                glVertex3f(v3.x + copies[i].x, v3.y + copies[i].y, v3.z + copies[i].z);
+                glVertex3f(v3.x * scale + copies[i].x, v3.y * scale + copies[i].y, v3.z * scale + copies[i].z);
             }
         }
         glEnd();
