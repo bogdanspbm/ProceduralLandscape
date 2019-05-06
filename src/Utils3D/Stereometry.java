@@ -23,4 +23,15 @@ public class Stereometry {
         return (float) (Math.sqrt((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y) + (a.z - b.z) * (a.z - b.z)));
     }
 
+    public static Vector3f rotateVectorY(Vector3f vec, float angle) {
+        if (angle == 0) {
+            return vec;
+        }
+        Vector3f res = new Vector3f();
+        res.x = (float) (vec.x * Math.cos(angle) - vec.z * Math.sin(angle));
+        res.z = (float) (vec.x * Math.sin(angle) + vec.z * Math.cos(angle));
+        res.y = vec.y;
+        return res;
+    }
+
 }

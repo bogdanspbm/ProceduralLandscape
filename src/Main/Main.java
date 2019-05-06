@@ -13,7 +13,7 @@ public class Main {
 
         // Создаем окно
         try {
-            Display.setDisplayMode(new DisplayMode(800, 800)); // Разрешение
+            Display.setDisplayMode(new DisplayMode(1400, 1000)); // Разрешение
             Display.setTitle("Engine"); // Имя окна
             Display.create();
         } catch (LWJGLException e) {

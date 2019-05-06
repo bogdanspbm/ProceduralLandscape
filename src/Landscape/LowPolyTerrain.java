@@ -27,7 +27,7 @@ public class LowPolyTerrain {
 
     private Texture terrainColors;
     private String texturePath = "res/textures/T_PolygonNature_01.tga";
-    String[] treePath = {"res/models/Tree.obj","res/models/TreeLod.obj"};
+    String[] treePath = {"res/models/Tree.obj", "res/models/TreeLod.obj"};
     private StaticMesh tree = new StaticMesh(treePath, "res/textures/T_PolygonNature_01.tga");
     private float seed;
     private boolean bGeneratedTrees = false;
@@ -42,6 +42,7 @@ public class LowPolyTerrain {
             ex.printStackTrace();
         }
 
+        tree.setScale(1.5f);
         seed = (float) (Math.PI * 2 * 10 * (1 + Math.random()));
     }
 
@@ -70,6 +71,11 @@ public class LowPolyTerrain {
                 break;
         }
         return textCoords;
+    }
+
+    public void refresh() {
+        tree.clearCopies();
+        bGeneratedTrees = false;
     }
 
     private static Vector2f[] selectRandomGray() {
@@ -172,7 +178,7 @@ public class LowPolyTerrain {
                 b = mat[x + 1][y + 1];
                 c = mat[x][y + 1];
                 if (canPlaceTree(mat, x, y)) {
-                    tree.addCopy((a.x + b.x + c.x) / 3, (a.y + b.y + c.y) / 3, (a.z + b.z + c.z) / 3);
+                    tree.addCopy((a.x + b.x + c.x) / 3, (a.y + b.y + c.y) / 3, (a.z + b.z + c.z) / 3, (float) (Math.random() * 360));
                 } else {
                     ///System.out.println("can't place");
                 }

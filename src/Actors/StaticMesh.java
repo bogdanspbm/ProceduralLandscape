@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.GL11;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
 import static org.lwjgl.opengl.GL11.glBegin;
@@ -14,7 +15,11 @@ import static org.lwjgl.opengl.GL11.glDisable;
 import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.opengl.GL11.glEnd;
 import static org.lwjgl.opengl.GL11.glNormal3f;
+import static org.lwjgl.opengl.GL11.glPopMatrix;
+import static org.lwjgl.opengl.GL11.glPushMatrix;
+import static org.lwjgl.opengl.GL11.glRotatef;
 import static org.lwjgl.opengl.GL11.glTexCoord2f;
+import static org.lwjgl.opengl.GL11.glTranslated;
 import static org.lwjgl.opengl.GL11.glVertex3f;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
@@ -31,6 +36,7 @@ public class StaticMesh {
     private Vector3f[] copies = new Vector3f[maxCount];
     private float scale = 1f;
     private int k = 0;
+    private float[] rotations = new float[maxCount];
     private float lodRange = 50f;
 
     public StaticMesh(String[] fileName, String fileName2) {
@@ -60,6 +66,15 @@ public class StaticMesh {
     public void addCopy(float x, float y, float z) {
         if (count < maxCount) {
             copies[count] = new Vector3f(x, y, z);
+            rotations[count] = 0;
+            count += 1;
+        }
+    }
+
+    public void addCopy(float x, float y, float z, float r) {
+        if (count < maxCount) {
+            copies[count] = new Vector3f(x, y, z);
+            rotations[count] = r;
             count += 1;
         }
     }
@@ -72,12 +87,23 @@ public class StaticMesh {
         lodRange = range;
     }
 
+    public void clearCopies() {
+        copies = new Vector3f[maxCount];
+        rotations = new float[maxCount];
+        count = 0;
+    }
+
     public void drawModel() {
-        texture.bind();
-        glEnable(GL_TEXTURE_2D);
-        glBegin(GL_TRIANGLES);
-        glColor3f(1, 1, 1);
         for (int i = 0; i < count; i++) {
+
+            glPushMatrix();
+            glTranslated(copies[i].x, copies[i].y, copies[i].z);
+            glRotatef(rotations[i], 0, 1, 0);
+
+            texture.bind();
+            glEnable(GL_TEXTURE_2D);
+            glBegin(GL_TRIANGLES);
+
             for (Model.Face face : m[k].getFaces()) {
 
                 //Первая точка
@@ -88,7 +114,7 @@ public class StaticMesh {
                     glTexCoord2f(t1.x, t1.y);
                 }
                 Vector3f v1 = m[k].getVertices().get(face.getVertexIndices()[0] - 1);
-                glVertex3f(v1.x * scale + copies[i].x, v1.y * scale + copies[i].y, v1.z * scale + copies[i].z);
+                glVertex3f(v1.x * scale, v1.y * scale, v1.z * scale);
 
                 // Вторая точка
                 Vector3f n2 = m[k].getNormals().get(face.getNormalIndices()[1] - 1);
@@ -98,7 +124,7 @@ public class StaticMesh {
                     glTexCoord2f(t2.x, t2.y);
                 }
                 Vector3f v2 = m[k].getVertices().get(face.getVertexIndices()[1] - 1);
-                glVertex3f(v2.x * scale + copies[i].x, v2.y * scale + copies[i].y, v2.z * scale + copies[i].z);
+                glVertex3f(v2.x * scale, v2.y * scale, v2.z * scale);
 
                 //Третья точка
                 Vector3f n3 = m[k].getNormals().get(face.getNormalIndices()[2] - 1);
@@ -108,20 +134,28 @@ public class StaticMesh {
                     glTexCoord2f(t3.x, t3.y);
                 }
                 Vector3f v3 = m[k].getVertices().get(face.getVertexIndices()[2] - 1);
-                glVertex3f(v3.x * scale + copies[i].x, v3.y * scale + copies[i].y, v3.z * scale + copies[i].z);
+                glVertex3f(v3.x * scale, v3.y * scale, v3.z * scale);
             }
+            glEnd();
+            glDisable(GL_TEXTURE_2D);
+            glRotatef(-rotations[i], 0, 1, 0);
+            glTranslated(-copies[i].x, -copies[i].y, -copies[i].z);
         }
-        glEnd();
-        glDisable(GL_TEXTURE_2D);
 
     }
 
     public void drawModel(Vector3f camLocation) {
-        texture.bind();
-        glEnable(GL_TEXTURE_2D);
-        glBegin(GL_TRIANGLES);
-        glColor3f(1, 1, 1);
+
         for (int i = 0; i < count; i++) {
+
+            glPushMatrix();
+            glTranslated(copies[i].x, copies[i].y, copies[i].z);
+            glRotatef(rotations[i], 0, 1, 0);
+
+            texture.bind();
+            glEnable(GL_TEXTURE_2D);
+            glBegin(GL_TRIANGLES);
+
             if (Stereometry.getVectorLenght(camLocation, copies[i]) < lodRange) {
                 k = 0;
             } else {
@@ -137,7 +171,7 @@ public class StaticMesh {
                     glTexCoord2f(t1.x, t1.y);
                 }
                 Vector3f v1 = m[k].getVertices().get(face.getVertexIndices()[0] - 1);
-                glVertex3f(v1.x * scale + copies[i].x, v1.y * scale + copies[i].y, v1.z * scale + copies[i].z);
+                glVertex3f(v1.x * scale, v1.y * scale, v1.z * scale);
 
                 // Вторая точка
                 Vector3f n2 = m[k].getNormals().get(face.getNormalIndices()[1] - 1);
@@ -147,7 +181,7 @@ public class StaticMesh {
                     glTexCoord2f(t2.x, t2.y);
                 }
                 Vector3f v2 = m[k].getVertices().get(face.getVertexIndices()[1] - 1);
-                glVertex3f(v2.x * scale + copies[i].x, v2.y * scale + copies[i].y, v2.z * scale + copies[i].z);
+                glVertex3f(v2.x * scale, v2.y * scale, v2.z * scale);
 
                 //Третья точка
                 Vector3f n3 = m[k].getNormals().get(face.getNormalIndices()[2] - 1);
@@ -157,11 +191,13 @@ public class StaticMesh {
                     glTexCoord2f(t3.x, t3.y);
                 }
                 Vector3f v3 = m[k].getVertices().get(face.getVertexIndices()[2] - 1);
-                glVertex3f(v3.x * scale + copies[i].x, v3.y * scale + copies[i].y, v3.z * scale + copies[i].z);
+                glVertex3f(v3.x * scale, v3.y * scale, v3.z * scale);
             }
+            glEnd();
+            glDisable(GL_TEXTURE_2D);
+            glRotatef(-rotations[i], 0, 1, 0);
+            glTranslated(-copies[i].x, -copies[i].y, -copies[i].z);
         }
-        glEnd();
-        glDisable(GL_TEXTURE_2D);
 
     }
 }
