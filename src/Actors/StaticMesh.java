@@ -64,6 +64,23 @@ public class StaticMesh {
         }
     }
 
+    public StaticMesh(String[] fileName) {
+        m = new Model[fileName.length];
+        for (int i = 0; i < fileName.length; i++) {
+            try {
+                m[i] = OBJLoader.loadTexturedModel(new File(fileName[i]));
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                Display.destroy();
+                System.exit(1);
+            } catch (IOException e) {
+                e.printStackTrace();
+                Display.destroy();
+                System.exit(1);
+            }
+        }
+    }
+
     public void addCopy(float x, float y, float z) {
         if (count < maxCount) {
             copies[count] = new Vector3f(x, y, z);
@@ -101,8 +118,10 @@ public class StaticMesh {
             glTranslated(copies[i].x, copies[i].y, copies[i].z);
             glRotatef(rotations[i], 0, 1, 0);
 
-            texture.bind();
-            glEnable(GL_TEXTURE_2D);
+            if (hasText == true) {
+                texture.bind();
+                glEnable(GL_TEXTURE_2D);
+            }
             glBegin(GL_TRIANGLES);
             glColor4f(1, 1, 1, 1);
 
@@ -154,9 +173,11 @@ public class StaticMesh {
             glTranslated(copies[i].x, copies[i].y, copies[i].z);
             glRotatef(rotations[i], 0, 1, 0);
 
-            texture.bind();
+            if (hasText == true) {
+                texture.bind();
+                glEnable(GL_TEXTURE_2D);
+            }
             glColor4f(1, 1, 1, 1);
-            glEnable(GL_TEXTURE_2D);
             glBegin(GL_TRIANGLES);
 
             if (Stereometry.getVectorLenght(camLocation, copies[i]) < lodRange) {

@@ -44,7 +44,7 @@ public class Main {
 
             // Частота кадров 1500 фпс как в майнкрафте
             Display.update();
-            Display.sync(60);
+            Display.sync(120);
         }
 
         //Удалить окно

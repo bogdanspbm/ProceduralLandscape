@@ -7,7 +7,6 @@ import static Utils3D.Stereometry.getVectorWorldDegree;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import static org.lwjgl.opengl.GL11.GL_QUADS;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
 import static org.lwjgl.opengl.GL11.glBegin;
@@ -27,12 +26,15 @@ public class LowPolyTerrain {
 
     private Texture terrainColors;
     private String texturePath = "res/textures/T_PolygonNature_01.tga";
-    String[] treePath = {"res/models/Tree.obj", "res/models/TreeLod.obj"};
-    String[] grassPath = {"res/models/Grass.obj", "res/models/GrassLod.obj"};
-    private StaticMesh tree = new StaticMesh(treePath, "res/textures/T_PolygonNature_01.tga");
-    private StaticMesh grass = new StaticMesh(grassPath, "res/textures/T_PolygonNature_01.tga");
+    // String[] treePath = {"res/models/Tree.obj", "res/models/TreeLod.obj"};
+    //String[] grassPath = {"res/models/Grass.obj", "res/models/GrassLod.obj"};
+    String[] buildingPath = {"res/models/platform.obj"};
+    private StaticMesh building = new StaticMesh(buildingPath);
+    //private StaticMesh tree = new StaticMesh(treePath, "res/textures/T_PolygonNature_01.tga");
+    //private StaticMesh grass = new StaticMesh(grassPath, "res/textures/T_PolygonNature_01.tga");
     private float seed;
     private boolean bGeneratedTrees = false;
+    private boolean bGeneratedBuilding = false;
     private static float waterLevel = 0.6f;
     private Camera cam;
 
@@ -43,8 +45,6 @@ public class LowPolyTerrain {
             System.out.print("Can't load texture");
             ex.printStackTrace();
         }
-
-        tree.setScale(1.5f);
         seed = (float) (Math.PI * 2 * 10 * (1 + Math.random()));
     }
 
@@ -76,8 +76,9 @@ public class LowPolyTerrain {
     }
 
     public void refresh() {
-        tree.clearCopies();
-        grass.clearCopies();
+        //tree.clearCopies();
+        //grass.clearCopies();
+        bGeneratedBuilding = false;
         bGeneratedTrees = false;
     }
 
@@ -199,7 +200,7 @@ public class LowPolyTerrain {
                 b = mat[x + 1][y + 1];
                 c = mat[x][y + 1];
                 if (canPlaceTree(mat, x, y)) {
-                    tree.addCopy((a.x + b.x + c.x) / 3 + (float) (-0.5f + Math.random()) * 6, (a.y + b.y + c.y) / 3, (a.z + b.z + c.z) / 3 + (float) (-0.5f + Math.random()) * 6, (float) (Math.random() * 360));
+                    //tree.addCopy((a.x + b.x + c.x) / 3 + (float) (-0.5f + Math.random()) * 6, (a.y + b.y + c.y) / 3, (a.z + b.z + c.z) / 3 + (float) (-0.5f + Math.random()) * 6, (float) (Math.random() * 360));
                 } else {
                     ///System.out.println("can't place");
                 }
@@ -211,7 +212,7 @@ public class LowPolyTerrain {
                 b = mat[x + 1][y + 1];
                 c = mat[x][y + 1];
                 if (canPlaceGrass(mat, x, y)) {
-                    grass.addCopy((a.x + b.x + c.x) / 3 + (float) (-0.5f + Math.random()) * 6, (a.y + b.y + c.y) / 3, (a.z + b.z + c.z) / 3 + (float) (-0.5f + Math.random()) * 6, (float) (Math.random() * 360));
+                    //grass.addCopy((a.x + b.x + c.x) / 3 + (float) (-0.5f + Math.random()) * 6, (a.y + b.y + c.y) / 3, (a.z + b.z + c.z) / 3 + (float) (-0.5f + Math.random()) * 6, (float) (Math.random() * 360));
                 } else {
                     ///System.out.println("can't place");
                 }
@@ -220,9 +221,27 @@ public class LowPolyTerrain {
         }
     }
 
+    public void generateBuilding(Vector3f[][] mat, int size, int count) {
+        if (bGeneratedBuilding == false) {
+            int x, y;
+            Vector3f a, b, c;
+            building.clearCopies();
+            for (int i = 0; i < count; i++) {
+                x = (int) (Math.random() * (size - 2));
+                y = (int) (Math.random() * (size - 2));
+                a = mat[x][y + 1];
+                b = mat[x + 1][y + 1];
+                c = mat[x][y + 1];
+                building.addCopy((a.x + b.x + c.x) / 3 + (float) (-0.5f + Math.random()) * 6, (a.y + b.y + c.y) / 3, (a.z + b.z + c.z) / 3 + (float) (-0.5f + Math.random()) * 6, (float) (Math.random() * 360));
+            }
+            bGeneratedBuilding = true;
+        }
+    }
+
     public void matrixToLandscape(Vector3f[][] mat, int size) {
 
-        generateTrees(mat, 10000, size);
+        //generateTrees(mat, 10000, size);
+        generateBuilding(mat, size, 10);
         terrainColors.bind();
         glEnable(GL_TEXTURE_2D);
         glBegin(GL_TRIANGLES);
@@ -235,8 +254,9 @@ public class LowPolyTerrain {
         }
         glEnd();
         glDisable(GL_TEXTURE_2D);
-        tree.drawModel(cam.getPos());
-        grass.drawModel(cam.getPos());
+        building.drawModel();
+        //tree.drawModel(cam.getPos());
+        //grass.drawModel(cam.getPos());
     }
 
 }

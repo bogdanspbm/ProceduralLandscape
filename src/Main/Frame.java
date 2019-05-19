@@ -31,11 +31,7 @@ public class Frame {
 
         // Закидываем сюда новые модели. Вся отрисовка между Push и Pop Матрицами
         glPushMatrix();
-
         game.render();
-        //glLight(GL_LIGHT0, GL_POSITION, BufferTools.asFlippedFloatBuffer(lightPosition));
-        // lightPosition = new float[]{game.cam.getRotation().x, game.cam.getRotation().y, 1.0f, 1};
-
         glPopMatrix();
     }
 
@@ -43,10 +39,8 @@ public class Frame {
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
         GLU.gluPerspective(45, (float) this.width / (float) this.height, 0.3f, 1000f);
-        //glMatrixMode(GL_MODELVIEW);
 
         setUpLighting();
-
     }
 
     private static void setUpLighting() {
@@ -59,7 +53,7 @@ public class Frame {
 
         glLightModel(GL_LIGHT_MODEL_AMBIENT, BufferTools.asFlippedFloatBuffer(new float[]{0.05f, 0.05f, 0.05f, 1f}));
         glLight(GL_LIGHT0, GL_POSITION, BufferTools.asFlippedFloatBuffer(lightPosition));
-       // glLight(GL_LIGHT0, GL_AMBIENT, BufferTools.asFlippedFloatBuffer(lightAmbient));
+        // glLight(GL_LIGHT0, GL_AMBIENT, BufferTools.asFlippedFloatBuffer(lightAmbient));
         glEnable(GL_CULL_FACE);
         glCullFace(GL_BACK);
         glEnable(GL_COLOR_MATERIAL);
