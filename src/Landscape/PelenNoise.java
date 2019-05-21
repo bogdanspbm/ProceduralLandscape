@@ -23,6 +23,11 @@ public final class PelenNoise {
         inum = getIPrime((int) (Math.random() * 19));
         fillZerosVerticesMatrix();
         genNoise();
+        /* for (int j = 0; j < 30; j++) {
+            int x0 = (int) (Math.random() * (cellCount - 1));
+            int y0 = (int) (Math.random() * (cellCount - 1));
+            flatZone(x0, y0, 2);
+        }*/
     }
 
     private int getIPrime(int i) {
@@ -108,6 +113,35 @@ public final class PelenNoise {
         }
     }
 
+    private void flatZone(int x, int y, int rad) {
+        float height = verticesMatrix[x][y].y;
+        float dh;
+        int istart = -rad;
+        int ifinish = rad;
+        int kstart = -rad;
+        int kfinish = rad;
+
+        if (x - rad < 0) {
+            istart = -x;
+        }
+        if (y - rad < 0) {
+            kstart = -y;
+        }
+        if (x + rad >= cellCount) {
+            ifinish = cellCount - 1 - x;
+        }
+        if (y + rad >= cellCount) {
+            kfinish = cellCount - 1 - y;
+        }
+
+        for (int i = istart; i <= ifinish; i++) {
+            for (int k = kstart; k <= kfinish; k++) {
+                dh = (verticesMatrix[i + x][k + y].y - height) / rad;
+                verticesMatrix[i + x][k + y].y = height + dh;
+            }
+        }
+    }
+
     private float cosinusCurve(float t) {
         return (float) (1 - Math.cos(t * Math.PI)) / 2;
     }
@@ -116,7 +150,6 @@ public final class PelenNoise {
         return a + (b - a) * t;
     }
 
- 
     private void fillZerosVerticesMatrix() {
         for (int i = 0; i < cellCount; i++) {
             for (int k = 0; k < cellCount; k++) {
