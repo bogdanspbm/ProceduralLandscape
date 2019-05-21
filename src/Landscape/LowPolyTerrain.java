@@ -2,6 +2,9 @@ package Landscape;
 
 import Actors.StaticMesh;
 import Main.Camera;
+import static Utils3D.Draw3D.flatZone;
+import static Utils3D.Draw3D.genRoadBetweenPoints;
+import static Utils3D.Draw3D.vec3ToMatCord;
 import static Utils3D.Stereometry.calcNormal;
 import static Utils3D.Stereometry.getVectorWorldDegree;
 import java.io.File;
@@ -28,15 +31,18 @@ public class LowPolyTerrain {
     private String texturePath = "res/textures/T_PolygonNature_01.tga";
     // String[] treePath = {"res/models/Tree.obj", "res/models/TreeLod.obj"};
     //String[] grassPath = {"res/models/Grass.obj", "res/models/GrassLod.obj"};
-    String[] buildingPath = {"res/models/platform.obj"};
-    private StaticMesh building = new StaticMesh(buildingPath);
+    String[] buildingPath = {"res/models/HouseA.obj"};
+    private StaticMesh building = new StaticMesh(buildingPath, "res/textures/PolygonAdventure_Tex_01.tga");
     //private StaticMesh tree = new StaticMesh(treePath, "res/textures/T_PolygonNature_01.tga");
     //private StaticMesh grass = new StaticMesh(grassPath, "res/textures/T_PolygonNature_01.tga");
     private float seed;
+    private int[] buildingsLocationsX, buildingsLocationsY;
     private boolean bGeneratedTrees = false;
     private boolean bGeneratedBuilding = false;
     private static float waterLevel = 0.6f;
     private Camera cam;
+    private Vector3f land[][], biom[][];
+    private int size = 0;
 
     public LowPolyTerrain() {
         try {
@@ -52,6 +58,12 @@ public class LowPolyTerrain {
         this.cam = cam;
     }
 
+    public void setGenerations(Vector3f[][] mat, Vector3f[][] biom, int size) {
+        this.land = mat;
+        this.biom = biom;
+        this.size = size;
+    }
+
     private static Vector2f[] selectRandomGreen() {
         Vector2f[] textCoords = new Vector2f[3];
         int caseNum = (int) (Math.random() * 0);
@@ -60,6 +72,29 @@ public class LowPolyTerrain {
                 textCoords[0] = new Vector2f(0f, 0.1f);
                 textCoords[1] = new Vector2f(0f, 0.1f);
                 textCoords[2] = new Vector2f(0f, 0.1f);
+                break;
+            case 1:
+                textCoords[0] = new Vector2f(0f, 9f);
+                textCoords[1] = new Vector2f(0f, 9f);
+                textCoords[2] = new Vector2f(0f, 9f);
+                break;
+            case 2:
+                textCoords[0] = new Vector2f(0f, 0.6f);
+                textCoords[1] = new Vector2f(0f, 0.6f);
+                textCoords[2] = new Vector2f(0f, 0.6f);
+                break;
+        }
+        return textCoords;
+    }
+
+    private static Vector2f[] selectRandomWhite() {
+        Vector2f[] textCoords = new Vector2f[3];
+        int caseNum = (int) (Math.random() * 0);
+        switch (caseNum) {
+            case 0:
+                textCoords[0] = new Vector2f(0.9f, 0.9f);
+                textCoords[1] = new Vector2f(0.9f, 0.9f);
+                textCoords[2] = new Vector2f(0.9f, 0.9f);
                 break;
             case 1:
                 textCoords[0] = new Vector2f(0f, 9f);
@@ -131,6 +166,28 @@ public class LowPolyTerrain {
 
     }
 
+    private Vector2f[] textureGetWithXY(Vector3f a, Vector3f b, Vector3f c, int x, int y) {
+        float normalDegree = getVectorWorldDegree(calcNormal(a, b, c));
+        if ((float) ((a.y + b.y + c.y) / 3) < (float) (waterLevel - 4f)) {
+            return selectSand();
+        }
+        if (biom[x][y].y > 0.5) {
+            if (normalDegree < 0.7f) {
+                return selectRandomGreen();
+
+            } else {
+                return selectRandomGray();
+            }
+        } else {
+            if (normalDegree < 0.7f) {
+                return selectRandomWhite();
+
+            } else {
+                return selectRandomGray();
+            }
+        }
+    }
+
     private void cellToFlat(Vector3f a, Vector3f b, Vector3f c, Vector3f d) {
         Vector3f normal = calcNormal(d, c, b);
         Vector2f[] texture = textureGet(d, c, b);
@@ -144,6 +201,28 @@ public class LowPolyTerrain {
 
         normal = calcNormal(a, d, b);
         texture = textureGet(a, d, b);
+        glNormal3f(normal.x, normal.y, normal.z);
+        glTexCoord2f(texture[0].x, texture[0].y);
+        glVertex3f(a.x, a.y, a.z);
+        glTexCoord2f(texture[1].x, texture[1].y);
+        glVertex3f(d.x, d.y, d.z);
+        glTexCoord2f(texture[2].x, texture[2].y);
+        glVertex3f(b.x, b.y, b.z);
+    }
+
+    private void cellToFlatWithXY(Vector3f a, Vector3f b, Vector3f c, Vector3f d, int x, int y) {
+        Vector3f normal = calcNormal(d, c, b);
+        Vector2f[] texture = textureGetWithXY(d, c, b, x, y);
+        glNormal3f(normal.x, normal.y, normal.z);
+        glTexCoord2f(texture[0].x, texture[0].y);
+        glVertex3f(d.x, d.y, d.z);
+        glTexCoord2f(texture[1].x, texture[1].y);
+        glVertex3f(c.x, c.y, c.z);
+        glTexCoord2f(texture[2].x, texture[2].y);
+        glVertex3f(b.x, b.y, b.z);
+
+        normal = calcNormal(a, d, b);
+        texture = textureGetWithXY(a, d, b, x, y);
         glNormal3f(normal.x, normal.y, normal.z);
         glTexCoord2f(texture[0].x, texture[0].y);
         glVertex3f(a.x, a.y, a.z);
@@ -221,20 +300,70 @@ public class LowPolyTerrain {
         }
     }
 
-    public void generateBuilding(Vector3f[][] mat, int size, int count) {
+    private void generateBuilding(Vector3f[][] mat, int size, int count) {
         if (bGeneratedBuilding == false) {
+
+            buildingsLocationsX = new int[count];
+            buildingsLocationsY = new int[count];
+
             int x, y;
             Vector3f a, b, c;
             building.clearCopies();
             for (int i = 0; i < count; i++) {
                 x = (int) (Math.random() * (size - 2));
                 y = (int) (Math.random() * (size - 2));
-                a = mat[x][y + 1];
-                b = mat[x + 1][y + 1];
-                c = mat[x][y + 1];
-                building.addCopy((a.x + b.x + c.x) / 3 + (float) (-0.5f + Math.random()) * 6, (a.y + b.y + c.y) / 3, (a.z + b.z + c.z) / 3 + (float) (-0.5f + Math.random()) * 6, (float) (Math.random() * 360));
+
+                if (mat[x][y].y > waterLevel) { // Выше уровня моря
+                    buildingsLocationsX[i] = x;
+                    buildingsLocationsY[i] = y;
+                    flatZone(x, y, 3, mat, size);
+                    a = mat[x][y + 1];
+                    b = mat[x + 1][y + 1];
+                    c = mat[x][y + 1];
+                    building.addCopy((a.x + b.x + c.x) / 3 + (float) (-0.5f + Math.random()) * 6, (a.y + b.y + c.y) / 3, (a.z + b.z + c.z) / 3 + (float) (-0.5f + Math.random()) * 6, (float) (Math.random() * 360));
+                }
+
             }
+            //generateRoads(mat, size, count);
             bGeneratedBuilding = true;
+        }
+    }
+
+    private void generateBuilding(int count) {
+        if (bGeneratedBuilding == false) {
+
+            buildingsLocationsX = new int[count];
+            buildingsLocationsY = new int[count];
+
+            int x, y;
+            Vector3f a, b, c;
+            building.clearCopies();
+            for (int i = 0; i < count; i++) {
+                x = (int) (Math.random() * (size - 2));
+                y = (int) (Math.random() * (size - 2));
+
+                if (land[x][y].y > waterLevel) { // Выше уровня моря
+                    buildingsLocationsX[i] = x;
+                    buildingsLocationsY[i] = y;
+                    flatZone(x, y, 3, land, size);
+                    a = land[x][y + 1];
+                    b = land[x + 1][y + 1];
+                    c = land[x][y + 1];
+                    building.addCopy((a.x + b.x + c.x) / 3 + (float) (-0.5f + Math.random()) * 6, (a.y + b.y + c.y) / 3, (a.z + b.z + c.z) / 3 + (float) (-0.5f + Math.random()) * 6, (float) (Math.random() * 360));
+                }
+
+            }
+            //generateRoads(mat, size, count);
+            bGeneratedBuilding = true;
+        }
+    }
+
+    private void generateRoads(Vector3f[][] mat, int size, int count) {
+        int a, b;
+        for (int i = 0; i < (int) (count / 2); i++) {
+            a = (int) (Math.random() * (count - 1));
+            b = (int) (Math.random() * (count - 1));
+            genRoadBetweenPoints(buildingsLocationsX[a], buildingsLocationsY[a], buildingsLocationsX[b], buildingsLocationsY[b], mat, size);
         }
     }
 
@@ -257,6 +386,25 @@ public class LowPolyTerrain {
         building.drawModel();
         //tree.drawModel(cam.getPos());
         //grass.drawModel(cam.getPos());
+    }
+
+    public void matrixToLandscape() {
+
+        generateBuilding(10);
+        terrainColors.bind();
+        glEnable(GL_TEXTURE_2D);
+        glBegin(GL_TRIANGLES);
+        glColor4f(1, 1, 1, 1);
+
+        for (int i = 0; i < size - 1; i++) {
+            for (int k = 0; k < size - 1; k++) {
+                cellToFlatWithXY(land[i][k], land[i + 1][k], land[i + 1][k + 1], land[i][k + 1], i, k);
+            }
+        }
+        glEnd();
+        glDisable(GL_TEXTURE_2D);
+        building.drawModel();
+
     }
 
 }

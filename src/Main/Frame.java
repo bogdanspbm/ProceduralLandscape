@@ -11,7 +11,7 @@ public class Frame {
 
     private int width, height; // Размеры окна 
     private Game game; // Клас в котором все что связано с миром
-    private static float[] lightPosition = {200.19f, 500.36f, -10.45f, 2f};
+    private static float[] lightPosition = {200.19f, 400.36f, -10.45f, 2f};
     private static float[] lightAmbient = {0.1f, 0.1f, 0.1f, 0.3f};
 
     public Frame() { // Конструктор
@@ -53,7 +53,7 @@ public class Frame {
 
         glLightModel(GL_LIGHT_MODEL_AMBIENT, BufferTools.asFlippedFloatBuffer(new float[]{0.05f, 0.05f, 0.05f, 1f}));
         glLight(GL_LIGHT0, GL_POSITION, BufferTools.asFlippedFloatBuffer(lightPosition));
-        // glLight(GL_LIGHT0, GL_AMBIENT, BufferTools.asFlippedFloatBuffer(lightAmbient));
+        glLight(GL_LIGHT0, GL_AMBIENT, BufferTools.asFlippedFloatBuffer(lightAmbient));
         glEnable(GL_CULL_FACE);
         glCullFace(GL_BACK);
         glEnable(GL_COLOR_MATERIAL);

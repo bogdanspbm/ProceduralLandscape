@@ -23,11 +23,19 @@ public final class PelenNoise {
         inum = getIPrime((int) (Math.random() * 19));
         fillZerosVerticesMatrix();
         genNoise();
+        System.out.println(verticesMatrix[0][0]);
+         System.out.println(verticesMatrix[0][1]);
         /* for (int j = 0; j < 30; j++) {
             int x0 = (int) (Math.random() * (cellCount - 1));
             int y0 = (int) (Math.random() * (cellCount - 1));
+        
             flatZone(x0, y0, 2);
         }*/
+        /*int x0 = (int) (Math.random() * (cellCount - 1));
+        int y0 = (int) (Math.random() * (cellCount - 1));
+        int x1 = (int) (Math.random() * (cellCount - 1));
+        int y1 = (int) (Math.random() * (cellCount - 1));
+        genRoadBetweenPoints(x0, y0, x1, y1);*/
     }
 
     private int getIPrime(int i) {
@@ -109,6 +117,37 @@ public final class PelenNoise {
             for (int j = 0; j < cellCount; j++) {
                 //проходим по всем элементам массива и заполняем их значениями   
                 verticesMatrix[i][j].y = 4f * perlinNoise2D((float) i / 2, (float) j / 2, fac) / scaler;
+            }
+        }
+    }
+
+    private void genRoadBetweenPoints(int x1, int y1, int x2, int y2) {
+        int xmin, xmax;
+        int ymin, ymax;
+        float dh;
+        if (x1 > x2) {
+            xmin = x2;
+            xmax = x1;
+            ymin = y2;
+            ymax = y1;
+        } else {
+            xmin = x1;
+            xmax = x2;
+            ymin = y1;
+            ymax = y2;
+        }
+        float kx = xmax - xmin;
+        float ky = ymax - ymin;
+        float k = kx / ky;
+        for (int i = 0; i < xmax - xmin; i++) {
+
+            if (y1 + k * i < cellCount && y1 + k * i >= 0) {
+                dh = verticesMatrix[(xmin + i)][(int) (y1 + k * i)].y + 10;
+                verticesMatrix[(xmin + i)][(int) (y1 + k * i)].y = dh;
+
+                if (y1 + k * i + 1 < cellCount && y1 + k * i + 1 >= 0) {
+                    verticesMatrix[(xmin + i)][(int) (y1 + k * i) + 1].y = dh;
+                }
             }
         }
     }

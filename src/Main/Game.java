@@ -18,6 +18,7 @@ public class Game {
     private LowPolyTerrain landscape = new LowPolyTerrain();
     private LowPolyOcean ocean = new LowPolyOcean();
     private PelenNoise noise = new PelenNoise();
+    private PelenNoise biom = new PelenNoise();
     int i = 0;
 
     public Game() {
@@ -25,6 +26,7 @@ public class Game {
         skySphere.addCopy(0, 200, 0);
         skySphere.setScale(2f);
         landscape.setCamera(cam);
+        landscape.setGenerations(noise.getNoiseMat(), biom.getNoiseMat(), noise.getSize());
 
     }
 
@@ -40,11 +42,13 @@ public class Game {
 
         if (Keyboard.isKeyDown(Keyboard.KEY_R)) { // Обновляю шум
             noise.refresh();
+            biom.refresh();
+            landscape.setGenerations(noise.getNoiseMat(), biom.getNoiseMat(), noise.getSize());
             landscape.refresh();
         }
 
         skySphere.drawModel();
-        landscape.matrixToLandscape(noise.getNoiseMat(), noise.getSize());
+        landscape.matrixToLandscape();
         ocean.drawOcean(noise.getNoiseMat());
     }
 }
