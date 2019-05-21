@@ -29,13 +29,15 @@ public class LowPolyTerrain {
 
     private Texture terrainColors;
     private String texturePath = "res/textures/T_PolygonNature_01.tga";
-    String[] treePath = {"res/models/PineA.obj"};
-    String[] buildingPath = {"res/models/HouseA.obj"};
+    private String[] pinePath = {"res/models/PineA.obj"};
+    private String[] treePath = {"res/models/TreeA.obj"};
+    private String[] buildingPath = {"res/models/HouseA.obj"};
     private StaticMesh building = new StaticMesh(buildingPath, "res/textures/PolygonAdventure_Tex_01.tga");
+    private StaticMesh pine = new StaticMesh(pinePath, "res/textures/T_PolygonNature_01.tga");
     private StaticMesh tree = new StaticMesh(treePath, "res/textures/T_PolygonNature_01.tga");
-    private float seed;
+    private final float seed;
     private int[] buildingsLocationsX, buildingsLocationsY;
-    private static float waterLevel = 0.6f;
+    private static final float waterLevel = 0.6f;
     private Camera cam;
     private Vector3f land[][], biom[][];
     private int size = 0;
@@ -48,6 +50,7 @@ public class LowPolyTerrain {
             ex.printStackTrace();
         }
         seed = (float) (Math.PI * 2 * 10 * (1 + Math.random()));
+        tree.setScale(1.5f);
     }
 
     public void setCamera(Camera cam) {
@@ -108,7 +111,8 @@ public class LowPolyTerrain {
 
     public void refresh() {
         generateBuilding(10);
-        generateStaticMesh(tree, 100, 1, waterLevel + 1f, 0.2f, 1000);
+        generateStaticMesh(pine, 100, 1, waterLevel + 1f, 0.7f, 1000);
+        generateStaticMesh(tree, 300, 0, waterLevel + 1f, 0.7f, 1000);
     }
 
     private static Vector2f[] selectRandomGray() {
@@ -337,6 +341,7 @@ public class LowPolyTerrain {
         glEnd();
         glDisable(GL_TEXTURE_2D);
         building.drawModel();
+        pine.drawModel();
         tree.drawModel();
 
     }
