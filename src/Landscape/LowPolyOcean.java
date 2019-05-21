@@ -18,9 +18,15 @@ public class LowPolyOcean {
     private float scaler = 2;
     private float waterLevel = -4f;
     private float[][] waterPoly = new float[size][size];
+    private Vector3f[][] biom;
 
     public LowPolyOcean() {
         generateRandHeight();
+    }
+
+    public void setGeneration(Vector3f[][] biom, int size) {
+        this.biom = biom;
+        this.size = size;
     }
 
     private void generateRandHeight() {
@@ -34,7 +40,11 @@ public class LowPolyOcean {
     private void calcNewHeight() {
         for (int i = 0; i < size - 1; i++) {
             for (int k = 0; k < size - 1; k++) {
-                waterPoly[i][k] += 0.01;
+                if (biom[i][k].y > 0.5) {
+                    waterPoly[i][k] += 0.01;
+                } else {
+                    waterPoly[i][k] = 0;
+                }
             }
         }
     }
@@ -55,6 +65,16 @@ public class LowPolyOcean {
 
     private void selectColor(Vector3f a, Vector3f b, Vector3f c, Vector3f d) {
         if ((a.y + b.y + c.y + d.y) / 4 < waterLevel) {
+            glColor4f(0.8f, 0.95f, 0.95f, 0.3f);
+        } else {
+            glColor4f(0.8f, 0.97f, 0.8f, 0.5f);
+        }
+    }
+
+    private void selectColorByXY(Vector3f a, Vector3f b, Vector3f c, Vector3f d, int x, int y) {
+        if (biom[x][y].y < 0.5) {
+            glColor4f(1f, 1f, 1f, 0.8f);
+        } else if ((a.y + b.y + c.y + d.y) / 4 < waterLevel) {
             glColor4f(0.8f, 0.95f, 0.95f, 0.3f);
         } else {
             glColor4f(0.8f, 0.97f, 0.8f, 0.5f);
@@ -84,7 +104,7 @@ public class LowPolyOcean {
                 d.y = (float) Math.sin(waterPoly[i][k + 1]);
                 d.z = mat[i][k + 1].z;
 
-                selectColor(mat[i][k], mat[i + 1][k], mat[i + 1][k + 1], mat[i][k + 1]);
+                selectColorByXY(mat[i][k], mat[i + 1][k], mat[i + 1][k + 1], mat[i][k + 1], i, k);
                 drawCell(a, b, c, d);
             }
         }

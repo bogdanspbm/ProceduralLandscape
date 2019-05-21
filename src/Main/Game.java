@@ -27,6 +27,8 @@ public class Game {
         skySphere.setScale(2f);
         landscape.setCamera(cam);
         landscape.setGenerations(noise.getNoiseMat(), biom.getNoiseMat(), noise.getSize());
+        ocean.setGeneration(biom.getNoiseMat(), biom.getSize());
+        landscape.refresh();
 
     }
 
@@ -44,6 +46,7 @@ public class Game {
             noise.refresh();
             biom.refresh();
             landscape.setGenerations(noise.getNoiseMat(), biom.getNoiseMat(), noise.getSize());
+            ocean.setGeneration(biom.getNoiseMat(), biom.getSize());
             landscape.refresh();
         }
 

@@ -23,19 +23,6 @@ public final class PelenNoise {
         inum = getIPrime((int) (Math.random() * 19));
         fillZerosVerticesMatrix();
         genNoise();
-        System.out.println(verticesMatrix[0][0]);
-         System.out.println(verticesMatrix[0][1]);
-        /* for (int j = 0; j < 30; j++) {
-            int x0 = (int) (Math.random() * (cellCount - 1));
-            int y0 = (int) (Math.random() * (cellCount - 1));
-        
-            flatZone(x0, y0, 2);
-        }*/
-        /*int x0 = (int) (Math.random() * (cellCount - 1));
-        int y0 = (int) (Math.random() * (cellCount - 1));
-        int x1 = (int) (Math.random() * (cellCount - 1));
-        int y1 = (int) (Math.random() * (cellCount - 1));
-        genRoadBetweenPoints(x0, y0, x1, y1);*/
     }
 
     private int getIPrime(int i) {
