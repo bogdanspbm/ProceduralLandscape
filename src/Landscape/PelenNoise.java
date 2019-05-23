@@ -8,6 +8,7 @@ public final class PelenNoise {
     private int cellCount = 300; // было 150
     private Vector3f[][] verticesMatrix = new Vector3f[cellCount][cellCount];
     private float[] verticesToBuffer = new float[(cellCount) * (cellCount) * 2 * 3 * 3];
+    private float[] textureToBuffer = new float[(cellCount) * (cellCount) * 2 * 3 * 2];
     private float scaler = 0.5f; // было 0.25f
     private float defaultFreq = 0.15f;
     private float defaultAmplitude = 8f;
@@ -44,21 +45,21 @@ public final class PelenNoise {
                 verticesToBuffer[cellCount * i * 18 + k * 18 + 7] = b;
                 verticesToBuffer[cellCount * i * 18 + k * 18 + 8] = c;
 
-                a = verticesMatrix[i][k+1].x;
-                b = verticesMatrix[i][k+1].y;
-                c = verticesMatrix[i][k+1].z;
+                a = verticesMatrix[i][k + 1].x;
+                b = verticesMatrix[i][k + 1].y;
+                c = verticesMatrix[i][k + 1].z;
                 verticesToBuffer[cellCount * i * 18 + k * 18 + 9] = a;
                 verticesToBuffer[cellCount * i * 18 + k * 18 + 10] = b;
                 verticesToBuffer[cellCount * i * 18 + k * 18 + 11] = c;
-                a = verticesMatrix[i+1][k + 1].x;
-                b = verticesMatrix[i+1][k + 1].y;
-                c = verticesMatrix[i+1][k + 1].z;
+                a = verticesMatrix[i + 1][k + 1].x;
+                b = verticesMatrix[i + 1][k + 1].y;
+                c = verticesMatrix[i + 1][k + 1].z;
                 verticesToBuffer[cellCount * i * 18 + k * 18 + 12] = a;
                 verticesToBuffer[cellCount * i * 18 + k * 18 + 13] = b;
                 verticesToBuffer[cellCount * i * 18 + k * 18 + 14] = c;
-                a = verticesMatrix[i+1][k].x;
-                b = verticesMatrix[i+1][k].y;
-                c = verticesMatrix[i+1][k].z;
+                a = verticesMatrix[i + 1][k].x;
+                b = verticesMatrix[i + 1][k].y;
+                c = verticesMatrix[i + 1][k].z;
                 verticesToBuffer[cellCount * i * 18 + k * 18 + 15] = a;
                 verticesToBuffer[cellCount * i * 18 + k * 18 + 16] = b;
                 verticesToBuffer[cellCount * i * 18 + k * 18 + 17] = c;
@@ -69,6 +70,10 @@ public final class PelenNoise {
 
     public float[] getVerticesVector() {
         return verticesToBuffer;
+    }
+
+    public float[] getTextureVector() {
+        return textureToBuffer;
     }
 
     public void refresh() {

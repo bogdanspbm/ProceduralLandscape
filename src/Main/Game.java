@@ -5,11 +5,15 @@ import Actors.VBOModel;
 import Landscape.LowPolyOcean;
 import Landscape.LowPolyTerrain;
 import Landscape.PelenNoise;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
-import static org.lwjgl.opengl.GL11.glPopMatrix;
-import static org.lwjgl.opengl.GL11.glPushMatrix;
 import static org.lwjgl.opengl.GL11.glTranslatef;
+import org.newdawn.slick.opengl.Texture;
+import org.newdawn.slick.opengl.TextureLoader;
 
 public class Game {
 
@@ -20,13 +24,15 @@ public class Game {
     private LowPolyOcean ocean = new LowPolyOcean();
     private PelenNoise noise = new PelenNoise();
     private PelenNoise biom = new PelenNoise();
+    private Texture tex;
     int i = 0;
 
     private float[] vertices;
+    private float[] textures;
 
     VBOModel model;
 
-    public Game() {
+    public Game() throws FileNotFoundException, IOException {
         cam = new Camera(20, 20, 20); // Cоздаем камеру с координатами x=0, y = 1, z = 5;
         skySphere.addCopy(0, 200, 0);
         skySphere.setScale(2f);
@@ -34,10 +40,12 @@ public class Game {
         landscape.setGenerations(noise.getNoiseMat(), biom.getNoiseMat(), noise.getSize());
         ocean.setGeneration(biom.getNoiseMat(), biom.getSize());
         landscape.refresh();
-        
+
+        tex = TextureLoader.getTexture("tga", new FileInputStream(new File("res/textures/T_Skybox_No_Snow_Diff.tga")));
         
         vertices = noise.getVerticesVector();
-        model = new VBOModel(vertices);
+        textures = noise.getTextureVector();
+        model = new VBOModel(vertices, textures);
 
     }
 
@@ -60,6 +68,7 @@ public class Game {
             vertices = noise.getVerticesVector();
         }
 
+        tex.bind();
         model.render();
         skySphere.drawModel();
         //landscape.matrixToLandscape();
