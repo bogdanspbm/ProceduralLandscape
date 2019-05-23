@@ -1,6 +1,5 @@
 package Main;
 
-import java.io.IOException;
 import org.lwjgl.util.glu.GLU;
 import static org.lwjgl.opengl.GL11.*;
 
@@ -12,7 +11,7 @@ public class Frame {
 
     private int width, height; // Размеры окна 
     private Game game; // Клас в котором все что связано с миром
-    private static float[] lightPosition = {0, 400.36f, 0, 2f};
+    private static float[] lightPosition = {2f, 2f, 2f, 2f};
     private static float[] lightAmbient = {0.1f, 0.1f, 0.1f, 0.3f};
 
     public Frame() { // Конструктор
@@ -28,8 +27,7 @@ public class Frame {
 
     public void render() { // Событие обработки кадров
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Чистим буферы из памяти карточки
-        //glClearColor(0.925f, 0.98f, 0.988f, 1f);
-        glClearColor(0.0925f, 0.098f, 0.0988f, 1f);
+        glClearColor(0.925f, 0.98f, 0.988f, 1f);
         // Закидываем сюда новые модели. Вся отрисовка между Push и Pop Матрицами
         glPushMatrix();
         game.render();
@@ -53,7 +51,7 @@ public class Frame {
         glEnable(GL_LIGHT0);
 
         glLightModel(GL_LIGHT_MODEL_AMBIENT, BufferTools.asFlippedFloatBuffer(new float[]{0.05f, 0.05f, 0.05f, 1f}));
-        glLight(GL_LIGHT0, GL_POSITION, BufferTools.asFlippedFloatBuffer(lightPosition));
+       // glLight(GL_LIGHT0, GL_POSITION, BufferTools.asFlippedFloatBuffer(lightPosition));
         glLight(GL_LIGHT0, GL_AMBIENT, BufferTools.asFlippedFloatBuffer(lightAmbient));
         glEnable(GL_CULL_FACE);
         glCullFace(GL_BACK);
