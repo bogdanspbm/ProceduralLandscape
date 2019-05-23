@@ -41,7 +41,7 @@ public class Game {
         ocean.setGeneration(biom.getNoiseMat(), biom.getSize());
         landscape.refresh();
 
-        tex = TextureLoader.getTexture("tga", new FileInputStream(new File("res/textures/T_Skybox_No_Snow_Diff.tga")));
+        tex = TextureLoader.getTexture("tga", new FileInputStream(new File("res/textures/PolygonAdventure_Tex_01.tga")));
         
         vertices = noise.getVerticesVector();
         textures = noise.getTextureVector();

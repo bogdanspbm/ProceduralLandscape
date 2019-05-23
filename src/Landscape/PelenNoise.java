@@ -5,11 +5,11 @@ import org.lwjgl.util.vector.Vector3f;
 
 public final class PelenNoise {
 
-    private int cellCount = 300; // было 150
+    private int cellCount = 500; // было 150
     private Vector3f[][] verticesMatrix = new Vector3f[cellCount][cellCount];
     private float[] verticesToBuffer = new float[(cellCount) * (cellCount) * 2 * 3 * 3];
     private float[] textureToBuffer = new float[(cellCount) * (cellCount) * 2 * 3 * 2];
-    private float scaler = 0.5f; // было 0.25f
+    private float scaler = 1f; // было 0.25f
     private float defaultFreq = 0.15f;
     private float defaultAmplitude = 8f;
     private float defaultPersis = 0.2f;
@@ -26,18 +26,27 @@ public final class PelenNoise {
         float a, b, c;
         for (int i = 0; i < cellCount - 1; i++) {
             for (int k = 0; k < cellCount - 1; k++) {
+
                 a = verticesMatrix[i][k].x;
                 b = verticesMatrix[i][k].y;
                 c = verticesMatrix[i][k].z;
                 verticesToBuffer[cellCount * i * 18 + k * 18] = a;
                 verticesToBuffer[cellCount * i * 18 + k * 18 + 1] = b;
                 verticesToBuffer[cellCount * i * 18 + k * 18 + 2] = c;
+
+                textureToBuffer[cellCount * i * 12 + k * 12] = texCordFromHeight(b)[0];
+                textureToBuffer[cellCount * i * 12 + k * 12 + 1] = texCordFromHeight(b)[1];
+
                 a = verticesMatrix[i][k + 1].x;
                 b = verticesMatrix[i][k + 1].y;
                 c = verticesMatrix[i][k + 1].z;
                 verticesToBuffer[cellCount * i * 18 + k * 18 + 3] = a;
                 verticesToBuffer[cellCount * i * 18 + k * 18 + 4] = b;
                 verticesToBuffer[cellCount * i * 18 + k * 18 + 5] = c;
+
+                textureToBuffer[cellCount * i * 12 + k * 12 + 2] = texCordFromHeight(b)[0];
+                textureToBuffer[cellCount * i * 12 + k * 12 + 3] = texCordFromHeight(b)[1];
+
                 a = verticesMatrix[i + 1][k].x;
                 b = verticesMatrix[i + 1][k].y;
                 c = verticesMatrix[i + 1][k].z;
@@ -45,18 +54,29 @@ public final class PelenNoise {
                 verticesToBuffer[cellCount * i * 18 + k * 18 + 7] = b;
                 verticesToBuffer[cellCount * i * 18 + k * 18 + 8] = c;
 
+                textureToBuffer[cellCount * i * 12 + k * 12 + 4] = texCordFromHeight(b)[0];
+                textureToBuffer[cellCount * i * 12 + k * 12 + 5] = texCordFromHeight(b)[1];
+
                 a = verticesMatrix[i][k + 1].x;
                 b = verticesMatrix[i][k + 1].y;
                 c = verticesMatrix[i][k + 1].z;
                 verticesToBuffer[cellCount * i * 18 + k * 18 + 9] = a;
                 verticesToBuffer[cellCount * i * 18 + k * 18 + 10] = b;
                 verticesToBuffer[cellCount * i * 18 + k * 18 + 11] = c;
+
+                textureToBuffer[cellCount * i * 12 + k * 12 + 6] = texCordFromHeight(b)[0];
+                textureToBuffer[cellCount * i * 12 + k * 12 + 7] = texCordFromHeight(b)[1];
+
                 a = verticesMatrix[i + 1][k + 1].x;
                 b = verticesMatrix[i + 1][k + 1].y;
                 c = verticesMatrix[i + 1][k + 1].z;
                 verticesToBuffer[cellCount * i * 18 + k * 18 + 12] = a;
                 verticesToBuffer[cellCount * i * 18 + k * 18 + 13] = b;
                 verticesToBuffer[cellCount * i * 18 + k * 18 + 14] = c;
+
+                textureToBuffer[cellCount * i * 12 + k * 12 + 8] = texCordFromHeight(b)[0];
+                textureToBuffer[cellCount * i * 12 + k * 12 + 9] = texCordFromHeight(b)[1];
+
                 a = verticesMatrix[i + 1][k].x;
                 b = verticesMatrix[i + 1][k].y;
                 c = verticesMatrix[i + 1][k].z;
@@ -64,8 +84,28 @@ public final class PelenNoise {
                 verticesToBuffer[cellCount * i * 18 + k * 18 + 16] = b;
                 verticesToBuffer[cellCount * i * 18 + k * 18 + 17] = c;
 
+                textureToBuffer[cellCount * i * 12 + k * 12 + 10] = texCordFromHeight(b)[0];
+                textureToBuffer[cellCount * i * 12 + k * 12 + 11] = texCordFromHeight(b)[1];
+
             }
         }
+    }
+
+    private static float[] texCordFromHeight(float h) {
+        float[] res = new float[2];
+        if (h < 0.2) {
+            res[0] = 0;
+            res[1] = 0;
+            return res;
+        }
+        if (h > 1) {
+            res[0] = 0.66f;
+            res[1] = 0.66f;
+            return res;
+        }
+        res[0] = 0.33f;
+        res[1] = 0.88f;
+        return res;
     }
 
     public float[] getVerticesVector() {
