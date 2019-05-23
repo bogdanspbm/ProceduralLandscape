@@ -1,5 +1,6 @@
 package Main;
 
+import java.io.IOException;
 import org.lwjgl.util.glu.GLU;
 import static org.lwjgl.opengl.GL11.*;
 
@@ -11,7 +12,7 @@ public class Frame {
 
     private int width, height; // Размеры окна 
     private Game game; // Клас в котором все что связано с миром
-    private static float[] lightPosition = {200.19f, 400.36f, -10.45f, 2f};
+    private static float[] lightPosition = {0, 400.36f, 0, 2f};
     private static float[] lightAmbient = {0.1f, 0.1f, 0.1f, 0.3f};
 
     public Frame() { // Конструктор

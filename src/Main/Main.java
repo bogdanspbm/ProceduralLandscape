@@ -3,6 +3,7 @@ package Main;
 // Мы рады пришельцам с других проектов
 // Не ругайте за русский , у меня в шк было 2
 // Мышку после включения не двигай, до отрисовки моделей, а то не найдешь потом ее в этой черной дыре
+import java.io.IOException;
 import org.lwjgl.opengl.*;
 import org.lwjgl.*;
 import org.lwjgl.input.Keyboard;

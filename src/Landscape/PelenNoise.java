@@ -5,7 +5,7 @@ import org.lwjgl.util.vector.Vector3f;
 
 public final class PelenNoise {
 
-    private int cellCount = 500; // было 150
+    private int cellCount = 200; // было 150
     private Vector3f[][] verticesMatrix = new Vector3f[cellCount][cellCount];
     private float[] verticesToBuffer = new float[(cellCount) * (cellCount) * 2 * 3 * 3];
     private float[] textureToBuffer = new float[(cellCount) * (cellCount) * 2 * 3 * 2];

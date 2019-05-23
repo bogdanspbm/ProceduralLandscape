@@ -38,13 +38,16 @@ public class StaticMesh {
     private float scale = 1f;
     private int k = 0;
     private float[] rotations = new float[maxCount];
-    private float lodRange = 50f;
+    private float[] vertices, textures;
+    private VBOModel optModel;
+    private Vector3f location = new Vector3f(0f, 0f, 0f);
 
     public StaticMesh(String[] fileName, String fileName2) {
         m = new Model[fileName.length];
         for (int i = 0; i < fileName.length; i++) {
             try {
                 m[i] = OBJLoader.loadTexturedModel(new File(fileName[i]));
+                convertToVBO(m[0]);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
                 Display.destroy();
@@ -64,11 +67,96 @@ public class StaticMesh {
         }
     }
 
+    public StaticMesh(String fileName) {
+        m = new Model[1];
+        try {
+            m[0] = OBJLoader.loadTexturedModel(new File(fileName));
+            convertToVBO(m[0]);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            Display.destroy();
+            System.exit(1);
+        } catch (IOException e) {
+            e.printStackTrace();
+            Display.destroy();
+            System.exit(1);
+        }
+    }
+
+    public StaticMesh(String fileName, Vector3f location) {
+        m = new Model[1];
+        try {
+            this.location = location;
+            m[0] = OBJLoader.loadTexturedModel(new File(fileName));
+            convertToVBO(m[0]);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            Display.destroy();
+            System.exit(1);
+        } catch (IOException e) {
+            e.printStackTrace();
+            Display.destroy();
+            System.exit(1);
+        }
+    }
+
+    private void convertToVBO(Model m) {
+        vertices = new float[m.getFaces().size() * 3 * 3];
+        textures = new float[m.getFaces().size() * 3 * 2];
+        int flagV = 0, flagT = 0;
+
+        for (Model.Face face : m.getFaces()) {
+
+            if (m.hasTextureCoordinates()) {
+                Vector2f t1 = m.getTextureCoordinates().get(face.getTextureCoordinateIndices()[0] - 1);
+                textures[flagT] = t1.x;
+                textures[flagT + 1] = t1.y;
+                flagT += 2;
+
+            }
+            Vector3f v1 = m.getVertices().get(face.getVertexIndices()[0] - 1);
+            vertices[flagV] = v1.x + location.x;
+            vertices[flagV + 1] = v1.y + location.y;
+            vertices[flagV + 2] = v1.z + location.z;
+            flagV += 3;
+
+            if (m.hasTextureCoordinates()) {
+                Vector2f t2 = m.getTextureCoordinates().get(face.getTextureCoordinateIndices()[1] - 1);
+                textures[flagT] = t2.x;
+                textures[flagT + 1] = t2.y;
+                flagT += 2;
+            }
+            Vector3f v2 = m.getVertices().get(face.getVertexIndices()[1] - 1);
+            vertices[flagV] = v2.x + location.x;
+            vertices[flagV + 1] = v2.y + location.y;
+            vertices[flagV + 2] = v2.z + location.z;
+            flagV += 3;
+
+            if (m.hasTextureCoordinates()) {
+                Vector2f t3 = m.getTextureCoordinates().get(face.getTextureCoordinateIndices()[2] - 1);
+                textures[flagT] = t3.x;
+                textures[flagT + 1] = t3.y;
+                flagT += 2;
+            }
+            Vector3f v3 = m.getVertices().get(face.getVertexIndices()[2] - 1);
+            vertices[flagV] = v3.x + location.x;
+            vertices[flagV + 1] = v3.y + location.y;
+            vertices[flagV + 2] = v3.z + location.z;
+            flagV += 3;
+        }
+        optModel = new VBOModel(vertices, textures);
+    }
+
+    public void drawVBO() {
+        optModel.render();
+    }
+
     public StaticMesh(String[] fileName) {
         m = new Model[fileName.length];
         for (int i = 0; i < fileName.length; i++) {
             try {
                 m[i] = OBJLoader.loadTexturedModel(new File(fileName[i]));
+                convertToVBO(m[0]);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
                 Display.destroy();
@@ -99,10 +187,6 @@ public class StaticMesh {
 
     public void setScale(float sc) {
         scale = sc;
-    }
-
-    public void setLodRange(float range) {
-        lodRange = range;
     }
 
     public void clearCopies() {
@@ -180,11 +264,6 @@ public class StaticMesh {
             glColor4f(1, 1, 1, 1);
             glBegin(GL_TRIANGLES);
 
-            if (Stereometry.getVectorLenght(camLocation, copies[i]) < lodRange) {
-                k = 0;
-            } else {
-                k = m.length - 1;
-            }
             for (Model.Face face : m[k].getFaces()) {
 
                 //Первая точка
