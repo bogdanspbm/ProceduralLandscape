@@ -41,6 +41,7 @@ public class LowPolyTerrain {
     private Camera cam;
     private Vector3f land[][], biom[][];
     private int size = 0;
+    private float biomHeightLimit = 0.5f;
 
     public LowPolyTerrain() {
         try {
@@ -110,6 +111,7 @@ public class LowPolyTerrain {
     }
 
     public void refresh() {
+        biomHeightLimit = (float)Math.random();
         generateBuilding(10);
         generateStaticMesh(pine, 100, 1, waterLevel + 1f, 0.7f, 1000);
         generateStaticMesh(tree, 300, 0, waterLevel + 1f, 0.7f, 1000);
@@ -169,7 +171,7 @@ public class LowPolyTerrain {
         if ((float) ((a.y + b.y + c.y) / 3) < (float) (waterLevel - 4f)) {
             return selectSand();
         }
-        if (biom[x][y].y > 0.5) {
+        if (biom[x][y].y > biomHeightLimit) {
             if (normalDegree < 0.7f) {
                 return selectRandomGreen();
 
@@ -198,7 +200,7 @@ public class LowPolyTerrain {
         glVertex3f(b.x, b.y, b.z);
 
         normal = calcNormal(a, d, b);
-        texture = textureGet(a, d, b);
+        //texture = textureGet(a, d, b);
         glNormal3f(normal.x, normal.y, normal.z);
         glTexCoord2f(texture[0].x, texture[0].y);
         glVertex3f(a.x, a.y, a.z);
@@ -220,7 +222,7 @@ public class LowPolyTerrain {
         glVertex3f(b.x, b.y, b.z);
 
         normal = calcNormal(a, d, b);
-        texture = textureGetWithXY(a, d, b, x, y);
+       // texture = textureGetWithXY(a, d, b, x, y);
         glNormal3f(normal.x, normal.y, normal.z);
         glTexCoord2f(texture[0].x, texture[0].y);
         glVertex3f(a.x, a.y, a.z);
@@ -283,7 +285,7 @@ public class LowPolyTerrain {
             }
             x = (int) (Math.random() * (size - 2));
             y = (int) (Math.random() * (size - 2));
-            if (this.biom[x][y].y > 0.5) {
+            if (this.biom[x][y].y > biomHeightLimit) {
                 dbiom = 0;
             } else {
                 dbiom = 1;

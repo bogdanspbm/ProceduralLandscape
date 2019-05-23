@@ -5,9 +5,10 @@ import org.lwjgl.util.vector.Vector3f;
 
 public final class PelenNoise {
 
-    private int cellCount = 150;
+    private int cellCount = 300; // было 150
     private Vector3f[][] verticesMatrix = new Vector3f[cellCount][cellCount];
-    private float scaler = 0.25f;
+    private float[] verticesToBuffer = new float[(cellCount) * (cellCount) * 2 * 3 * 3];
+    private float scaler = 0.5f; // было 0.25f
     private float defaultFreq = 0.15f;
     private float defaultAmplitude = 8f;
     private float defaultPersis = 0.2f;
@@ -19,10 +20,62 @@ public final class PelenNoise {
         refresh();
     }
 
+    private void matToVector() {
+        int x = 0, y = 0;
+        float a, b, c;
+        for (int i = 0; i < cellCount - 1; i++) {
+            for (int k = 0; k < cellCount - 1; k++) {
+                a = verticesMatrix[i][k].x;
+                b = verticesMatrix[i][k].y;
+                c = verticesMatrix[i][k].z;
+                verticesToBuffer[cellCount * i * 18 + k * 18] = a;
+                verticesToBuffer[cellCount * i * 18 + k * 18 + 1] = b;
+                verticesToBuffer[cellCount * i * 18 + k * 18 + 2] = c;
+                a = verticesMatrix[i][k + 1].x;
+                b = verticesMatrix[i][k + 1].y;
+                c = verticesMatrix[i][k + 1].z;
+                verticesToBuffer[cellCount * i * 18 + k * 18 + 3] = a;
+                verticesToBuffer[cellCount * i * 18 + k * 18 + 4] = b;
+                verticesToBuffer[cellCount * i * 18 + k * 18 + 5] = c;
+                a = verticesMatrix[i + 1][k].x;
+                b = verticesMatrix[i + 1][k].y;
+                c = verticesMatrix[i + 1][k].z;
+                verticesToBuffer[cellCount * i * 18 + k * 18 + 6] = a;
+                verticesToBuffer[cellCount * i * 18 + k * 18 + 7] = b;
+                verticesToBuffer[cellCount * i * 18 + k * 18 + 8] = c;
+
+                a = verticesMatrix[i][k+1].x;
+                b = verticesMatrix[i][k+1].y;
+                c = verticesMatrix[i][k+1].z;
+                verticesToBuffer[cellCount * i * 18 + k * 18 + 9] = a;
+                verticesToBuffer[cellCount * i * 18 + k * 18 + 10] = b;
+                verticesToBuffer[cellCount * i * 18 + k * 18 + 11] = c;
+                a = verticesMatrix[i+1][k + 1].x;
+                b = verticesMatrix[i+1][k + 1].y;
+                c = verticesMatrix[i+1][k + 1].z;
+                verticesToBuffer[cellCount * i * 18 + k * 18 + 12] = a;
+                verticesToBuffer[cellCount * i * 18 + k * 18 + 13] = b;
+                verticesToBuffer[cellCount * i * 18 + k * 18 + 14] = c;
+                a = verticesMatrix[i+1][k].x;
+                b = verticesMatrix[i+1][k].y;
+                c = verticesMatrix[i+1][k].z;
+                verticesToBuffer[cellCount * i * 18 + k * 18 + 15] = a;
+                verticesToBuffer[cellCount * i * 18 + k * 18 + 16] = b;
+                verticesToBuffer[cellCount * i * 18 + k * 18 + 17] = c;
+
+            }
+        }
+    }
+
+    public float[] getVerticesVector() {
+        return verticesToBuffer;
+    }
+
     public void refresh() {
         inum = getIPrime((int) (Math.random() * 19));
         fillZerosVerticesMatrix();
         genNoise();
+        matToVector();
     }
 
     private int getIPrime(int i) {

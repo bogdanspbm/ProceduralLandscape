@@ -1,6 +1,7 @@
 package Main;
 
 import Actors.StaticMesh;
+import Actors.VBOModel;
 import Landscape.LowPolyOcean;
 import Landscape.LowPolyTerrain;
 import Landscape.PelenNoise;
@@ -21,6 +22,10 @@ public class Game {
     private PelenNoise biom = new PelenNoise();
     int i = 0;
 
+    private float[] vertices;
+
+    VBOModel model;
+
     public Game() {
         cam = new Camera(20, 20, 20); // Cоздаем камеру с координатами x=0, y = 1, z = 5;
         skySphere.addCopy(0, 200, 0);
@@ -29,6 +34,10 @@ public class Game {
         landscape.setGenerations(noise.getNoiseMat(), biom.getNoiseMat(), noise.getSize());
         ocean.setGeneration(biom.getNoiseMat(), biom.getSize());
         landscape.refresh();
+        
+        
+        vertices = noise.getVerticesVector();
+        model = new VBOModel(vertices);
 
     }
 
@@ -48,10 +57,12 @@ public class Game {
             landscape.setGenerations(noise.getNoiseMat(), biom.getNoiseMat(), noise.getSize());
             ocean.setGeneration(biom.getNoiseMat(), biom.getSize());
             landscape.refresh();
+            vertices = noise.getVerticesVector();
         }
 
+        model.render();
         skySphere.drawModel();
-        landscape.matrixToLandscape();
-        ocean.drawOcean(noise.getNoiseMat());
+        //landscape.matrixToLandscape();
+        //ocean.drawOcean(noise.getNoiseMat());
     }
 }
