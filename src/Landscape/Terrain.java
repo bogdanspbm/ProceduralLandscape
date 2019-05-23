@@ -20,7 +20,7 @@ public class Terrain {
     public Terrain() {
         terrainModel = new VBOModel(noise.getVerticesVector(), makeTexturesVector());
         try {
-            texture = TextureLoader.getTexture("tga", new FileInputStream(new File("res/textures/1024Grass.tga")));
+            texture = TextureLoader.getTexture("tga", new FileInputStream(new File("res/textures/GrassLong.tga")));
         } catch (FileNotFoundException ex) {
             Logger.getLogger(Skybox.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
@@ -38,11 +38,11 @@ public class Terrain {
         for (int i = 0; i < vertices.length; i += 3) {
             height = vertices[i + 1];
             if (height < 0.5) {
-                textures[flag] = vertices[i] / 10;
-                textures[flag + 1] = vertices[i + 2] / 10;
+                textures[flag] = (vertices[i] / 10) % 1;
+                textures[flag + 1] = Math.abs(vertices[i + 2] / 10) % 0.5f;
             } else {
-                textures[flag] = vertices[i] / 10;
-                textures[flag + 1] = vertices[i + 2] / 10;
+                textures[flag] = (vertices[i] / 10)  % 1;
+                textures[flag + 1] = Math.abs(vertices[i + 2] / 10) % 0.5f;
             }
             // Selection logic
             flag += 2;
