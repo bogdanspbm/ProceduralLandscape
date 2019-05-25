@@ -19,7 +19,7 @@ public class Terrain {
 
     private PelenNoise noise;
     private VBOModel terrainModel;
-    private Texture texture;
+    private Texture textureLand, textureGrass;
     StaticMesh trees;
     float[] vertices, textures;
 
@@ -46,7 +46,8 @@ public class Terrain {
 
     private void loadTexture() {
         try {
-            texture = TextureLoader.getTexture("tga", new FileInputStream(new File("res/textures/TerrainTexture.tga")));
+            textureLand = TextureLoader.getTexture("tga", new FileInputStream(new File("res/textures/TerrainTexture.tga")));
+            textureGrass = TextureLoader.getTexture("tga", new FileInputStream(new File("res/textures/T_PolygonNature_01.tga")));
         } catch (FileNotFoundException ex) {
             Logger.getLogger(Skybox.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
@@ -100,11 +101,11 @@ public class Terrain {
         int flag = 0;
         for (int i = 0; i < vertices.length; i += 9) {
             if (canPlaceGrass(i)) {
-                locations[flag] = new Vector3f(vertices[i], vertices[i + 1], vertices[i + 2]);
+                locations[flag] = new Vector3f(vertices[i], vertices[i + 1] - 0.2f, vertices[i + 2]);
                 flag += 1;
             }
         }
-        trees = new StaticMesh("res/models/Grass.obj", locations);
+        trees = new StaticMesh("res/models/Grass.obj", locations, 0.5f);
     }
 
     private int calcGrassPlacesCount() {
@@ -139,8 +140,9 @@ public class Terrain {
     }
 
     public void draw() {
-        texture.bind();
+        textureLand.bind();
         terrainModel.renderTextured();
+        textureGrass.bind();
         trees.drawVBO();
     }
 

@@ -1,6 +1,7 @@
 package Actors;
 
 import Utils3D.Stereometry;
+import static Utils3D.Stereometry.rotateVectorY;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -118,6 +119,24 @@ public class StaticMesh {
         }
     }
 
+    public StaticMesh(String fileName, Vector3f[] locations, float scale) {
+        m = new Model[1];
+        this.scale = scale;
+        try {
+            this.locations = locations;
+            m[0] = OBJLoader.loadTexturedModel(new File(fileName));
+            convertToVBOMany(m[0]);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            Display.destroy();
+            System.exit(1);
+        } catch (IOException e) {
+            e.printStackTrace();
+            Display.destroy();
+            System.exit(1);
+        }
+    }
+
     private void convertToVBO(Model m) {
         vertices = new float[m.getFaces().size() * 3 * 3];
         normals = new float[m.getFaces().size() * 3 * 3];
@@ -138,9 +157,9 @@ public class StaticMesh {
 
             }
             Vector3f v1 = m.getVertices().get(face.getVertexIndices()[0] - 1);
-            vertices[flagV] = v1.x + location.x;
-            vertices[flagV + 1] = v1.y + location.y;
-            vertices[flagV + 2] = v1.z + location.z;
+            vertices[flagV] = v1.x * scale + location.x;
+            vertices[flagV + 1] = v1.y * scale + location.y;
+            vertices[flagV + 2] = v1.z * scale + location.z;
             flagV += 3;
 
             Vector3f n2 = m.getNormals().get(face.getNormalIndices()[1] - 1);
@@ -154,9 +173,9 @@ public class StaticMesh {
                 flagT += 2;
             }
             Vector3f v2 = m.getVertices().get(face.getVertexIndices()[1] - 1);
-            vertices[flagV] = v2.x + location.x;
-            vertices[flagV + 1] = v2.y + location.y;
-            vertices[flagV + 2] = v2.z + location.z;
+            vertices[flagV] = v2.x * scale + location.x;
+            vertices[flagV + 1] = v2.y * scale + location.y;
+            vertices[flagV + 2] = v2.z * scale + location.z;
             flagV += 3;
 
             Vector3f n3 = m.getNormals().get(face.getNormalIndices()[2] - 1);
@@ -171,9 +190,9 @@ public class StaticMesh {
                 flagT += 2;
             }
             Vector3f v3 = m.getVertices().get(face.getVertexIndices()[2] - 1);
-            vertices[flagV] = v3.x + location.x;
-            vertices[flagV + 1] = v3.y + location.y;
-            vertices[flagV + 2] = v3.z + location.z;
+            vertices[flagV] = v3.x * scale + location.x;
+            vertices[flagV + 1] = v3.y * scale + location.y;
+            vertices[flagV + 2] = v3.z * scale + location.z;
             flagV += 3;
         }
         optModel = new VBOModel(vertices, normals, textures);
@@ -183,46 +202,59 @@ public class StaticMesh {
         vertices = new float[m.getFaces().size() * 3 * 3 * locations.length];
         normals = new float[m.getFaces().size() * 3 * 3 * locations.length];
         textures = new float[m.getFaces().size() * 3 * 2 * locations.length];
+        float textCord = 0f, rotate = 0f;
         int flagV = 0, flagT = 0;
 
         for (int i = 0; i < locations.length; i++) {
             location = locations[i];
+            rotate = (float) Math.random() * 360;
+
+            if (Math.random() > 0.33f) {
+                if (Math.random() > 0.66f) {
+                    textCord = 0.1f;
+                } else {
+                    textCord = 0.5f;
+                }
+            } else {
+                textCord = 0f;
+            }
+
             for (Model.Face face : m.getFaces()) {
 
-                Vector3f n1 = m.getNormals().get(face.getNormalIndices()[0] - 1);
+                Vector3f n1 = rotateVectorY(m.getNormals().get(face.getNormalIndices()[0] - 1), rotate);
                 normals[flagV] = n1.x;
                 normals[flagV + 1] = n1.y;
                 normals[flagV + 2] = n1.z;
                 if (m.hasTextureCoordinates()) {
                     Vector2f t1 = m.getTextureCoordinates().get(face.getTextureCoordinateIndices()[0] - 1);
                     textures[flagT] = t1.x;
-                    textures[flagT + 1] = t1.y;
+                    textures[flagT + 1] = t1.y + textCord;
                     flagT += 2;
 
                 }
-                Vector3f v1 = m.getVertices().get(face.getVertexIndices()[0] - 1);
-                vertices[flagV] = v1.x + location.x;
-                vertices[flagV + 1] = v1.y + location.y;
-                vertices[flagV + 2] = v1.z + location.z;
+                Vector3f v1 = rotateVectorY(m.getVertices().get(face.getVertexIndices()[0] - 1), rotate);
+                vertices[flagV] = v1.x * scale + location.x;
+                vertices[flagV + 1] = v1.y * scale + location.y;
+                vertices[flagV + 2] = v1.z * scale + location.z;
                 flagV += 3;
 
-                Vector3f n2 = m.getNormals().get(face.getNormalIndices()[1] - 1);
+                Vector3f n2 = rotateVectorY(m.getNormals().get(face.getNormalIndices()[1] - 1), rotate);
                 normals[flagV] = n2.x;
                 normals[flagV + 1] = n2.y;
                 normals[flagV + 2] = n2.z;
                 if (m.hasTextureCoordinates()) {
                     Vector2f t2 = m.getTextureCoordinates().get(face.getTextureCoordinateIndices()[1] - 1);
                     textures[flagT] = t2.x;
-                    textures[flagT + 1] = t2.y;
+                    textures[flagT + 1] = t2.y + textCord;
                     flagT += 2;
                 }
-                Vector3f v2 = m.getVertices().get(face.getVertexIndices()[1] - 1);
-                vertices[flagV] = v2.x + location.x;
-                vertices[flagV + 1] = v2.y + location.y;
-                vertices[flagV + 2] = v2.z + location.z;
+                Vector3f v2 = rotateVectorY(m.getVertices().get(face.getVertexIndices()[1] - 1), rotate);
+                vertices[flagV] = v2.x * scale + location.x;
+                vertices[flagV + 1] = v2.y * scale + location.y;
+                vertices[flagV + 2] = v2.z * scale + location.z;
                 flagV += 3;
 
-                Vector3f n3 = m.getNormals().get(face.getNormalIndices()[2] - 1);
+                Vector3f n3 = rotateVectorY(m.getNormals().get(face.getNormalIndices()[2] - 1), rotate);
                 normals[flagV] = n3.x;
                 normals[flagV + 1] = n3.y;
                 normals[flagV + 2] = n3.z;
@@ -230,14 +262,14 @@ public class StaticMesh {
                 if (m.hasTextureCoordinates()) {
                     Vector2f t3 = m.getTextureCoordinates().get(face.getTextureCoordinateIndices()[2] - 1);
                     textures[flagT] = t3.x;
-                    textures[flagT + 1] = t3.y;
+                    textures[flagT + 1] = t3.y + textCord;
                     flagT += 2;
                 }
-                Vector3f v3 = m.getVertices().get(face.getVertexIndices()[2] - 1);
-                vertices[flagV] = v3.x + location.x;
-                vertices[flagV + 1] = v3.y + location.y;
-                vertices[flagV + 2] = v3.z + location.z;
-                
+                Vector3f v3 = rotateVectorY(m.getVertices().get(face.getVertexIndices()[2] - 1), rotate);
+                vertices[flagV] = v3.x * scale + location.x;
+                vertices[flagV + 1] = v3.y * scale + location.y;
+                vertices[flagV + 2] = v3.z * scale + location.z;
+
                 flagV += 3;
             }
         }
