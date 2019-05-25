@@ -14,14 +14,14 @@ public class Game {
 
     public final Camera cam;
     private LowPolyOcean ocean = new LowPolyOcean();
-    private PelenNoise biom = new PelenNoise();
+    //private PelenNoise biom = new PelenNoise();
     private Terrain landscape = new Terrain();
     private Skybox skySphere = new Skybox();
     int i = 0;
 
     public Game() {
         cam = new Camera(20, 20, 20); // Cоздаем камеру с координатами x=0, y = 1, z = 5;
-        ocean.setGeneration(biom.getNoiseMat(), biom.getSize());
+        //ocean.setGeneration(biom.getNoiseMat(), biom.getSize());
 
     }
 
@@ -36,8 +36,8 @@ public class Game {
         glTranslatef(-cam.getPos().x, -cam.getPos().y, -cam.getPos().z); // Ставлю координаты в пространтсве
 
         if (Keyboard.isKeyDown(Keyboard.KEY_R)) { // Обновляю шум
-            biom.refresh();
-            ocean.setGeneration(biom.getNoiseMat(), biom.getSize());
+            //biom.refresh();
+           // ocean.setGeneration(biom.getNoiseMat(), biom.getSize());
 
         }
 

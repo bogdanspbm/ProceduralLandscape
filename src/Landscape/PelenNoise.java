@@ -6,9 +6,8 @@ import org.lwjgl.util.vector.Vector3f;
 public final class PelenNoise {
 
     private int cellCount = 200; // было 150
-    private Vector3f[][] verticesMatrix = new Vector3f[cellCount][cellCount];
-    private float[] verticesToBuffer = new float[(cellCount) * (cellCount) * 2 * 3 * 3];
-    private float[] textureToBuffer = new float[(cellCount) * (cellCount) * 2 * 3 * 2];
+    private Vector3f[][] verticesMatrix;
+    private float[] verticesToBuffer;
     private float scaler = 1f; // было 0.25f
     private float defaultFreq = 0.15f;
     private float defaultAmplitude = 8f;
@@ -18,77 +17,102 @@ public final class PelenNoise {
     float seed = (float) (Math.PI * 2 * 10 * (1 + Math.random()));
 
     public PelenNoise() {
+        verticesToBuffer = new float[(cellCount - 1) * (cellCount - 1) * 18];
+        verticesMatrix = new Vector3f[cellCount][cellCount];
+        refresh();
+    }
+
+    public PelenNoise(float scaler, int size) {
+        this.cellCount = size;
+        this.scaler = scaler;
+        verticesToBuffer = new float[(cellCount - 1) * (cellCount - 1) * 18];
+        verticesMatrix = new Vector3f[cellCount][cellCount];
         refresh();
     }
 
     private void matToVector() {
         int x = 0, y = 0;
         float a, b, c;
+        int counterV = 0;
         for (int i = 0; i < cellCount - 1; i++) {
             for (int k = 0; k < cellCount - 1; k++) {
 
                 a = verticesMatrix[i][k].x;
                 b = verticesMatrix[i][k].y;
                 c = verticesMatrix[i][k].z;
-                verticesToBuffer[cellCount * i * 18 + k * 18] = a;
-                verticesToBuffer[cellCount * i * 18 + k * 18 + 1] = b;
-                verticesToBuffer[cellCount * i * 18 + k * 18 + 2] = c;
 
-                textureToBuffer[cellCount * i * 12 + k * 12] = texCordFromHeight(b)[0];
-                textureToBuffer[cellCount * i * 12 + k * 12 + 1] = texCordFromHeight(b)[1];
+                verticesToBuffer[counterV] = a;
+                counterV++;
+                verticesToBuffer[counterV] = b;
+                counterV++;
+                verticesToBuffer[counterV] = c;
+                counterV++;
+
+
 
                 a = verticesMatrix[i][k + 1].x;
                 b = verticesMatrix[i][k + 1].y;
                 c = verticesMatrix[i][k + 1].z;
-                verticesToBuffer[cellCount * i * 18 + k * 18 + 3] = a;
-                verticesToBuffer[cellCount * i * 18 + k * 18 + 4] = b;
-                verticesToBuffer[cellCount * i * 18 + k * 18 + 5] = c;
+                ;
+                verticesToBuffer[counterV] = a;
+                counterV++;
+                verticesToBuffer[counterV] = b;
+                counterV++;
+                verticesToBuffer[counterV] = c;
+                counterV++;
 
-                textureToBuffer[cellCount * i * 12 + k * 12 + 2] = texCordFromHeight(b)[0];
-                textureToBuffer[cellCount * i * 12 + k * 12 + 3] = texCordFromHeight(b)[1];
+
 
                 a = verticesMatrix[i + 1][k].x;
                 b = verticesMatrix[i + 1][k].y;
                 c = verticesMatrix[i + 1][k].z;
-                verticesToBuffer[cellCount * i * 18 + k * 18 + 6] = a;
-                verticesToBuffer[cellCount * i * 18 + k * 18 + 7] = b;
-                verticesToBuffer[cellCount * i * 18 + k * 18 + 8] = c;
 
-                textureToBuffer[cellCount * i * 12 + k * 12 + 4] = texCordFromHeight(b)[0];
-                textureToBuffer[cellCount * i * 12 + k * 12 + 5] = texCordFromHeight(b)[1];
+                verticesToBuffer[counterV] = a;
+                counterV++;
+                verticesToBuffer[counterV] = b;
+                counterV++;
+                verticesToBuffer[counterV] = c;
+                counterV++;
+
+
 
                 a = verticesMatrix[i][k + 1].x;
                 b = verticesMatrix[i][k + 1].y;
                 c = verticesMatrix[i][k + 1].z;
-                verticesToBuffer[cellCount * i * 18 + k * 18 + 9] = a;
-                verticesToBuffer[cellCount * i * 18 + k * 18 + 10] = b;
-                verticesToBuffer[cellCount * i * 18 + k * 18 + 11] = c;
+                verticesToBuffer[counterV] = a;
+                counterV++;
+                verticesToBuffer[counterV] = b;
+                counterV++;
+                verticesToBuffer[counterV] = c;
+                counterV++;
 
-                textureToBuffer[cellCount * i * 12 + k * 12 + 6] = texCordFromHeight(b)[0];
-                textureToBuffer[cellCount * i * 12 + k * 12 + 7] = texCordFromHeight(b)[1];
 
                 a = verticesMatrix[i + 1][k + 1].x;
                 b = verticesMatrix[i + 1][k + 1].y;
                 c = verticesMatrix[i + 1][k + 1].z;
-                verticesToBuffer[cellCount * i * 18 + k * 18 + 12] = a;
-                verticesToBuffer[cellCount * i * 18 + k * 18 + 13] = b;
-                verticesToBuffer[cellCount * i * 18 + k * 18 + 14] = c;
+                
+                verticesToBuffer[counterV] = a;
+                counterV++;
+                verticesToBuffer[counterV] = b;
+                counterV++;
+                verticesToBuffer[counterV] = c;
+                counterV++;
 
-                textureToBuffer[cellCount * i * 12 + k * 12 + 8] = texCordFromHeight(b)[0];
-                textureToBuffer[cellCount * i * 12 + k * 12 + 9] = texCordFromHeight(b)[1];
 
                 a = verticesMatrix[i + 1][k].x;
                 b = verticesMatrix[i + 1][k].y;
                 c = verticesMatrix[i + 1][k].z;
-                verticesToBuffer[cellCount * i * 18 + k * 18 + 15] = a;
-                verticesToBuffer[cellCount * i * 18 + k * 18 + 16] = b;
-                verticesToBuffer[cellCount * i * 18 + k * 18 + 17] = c;
 
-                textureToBuffer[cellCount * i * 12 + k * 12 + 10] = texCordFromHeight(b)[0];
-                textureToBuffer[cellCount * i * 12 + k * 12 + 11] = texCordFromHeight(b)[1];
-
+                verticesToBuffer[counterV] = a;
+                counterV++;
+                verticesToBuffer[counterV] = b;
+                counterV++;
+                verticesToBuffer[counterV] = c;
+                counterV++;
             }
+            
         }
+        System.out.println(counterV);
     }
 
     private static float[] texCordFromHeight(float h) {
@@ -112,9 +136,6 @@ public final class PelenNoise {
         return verticesToBuffer;
     }
 
-    public float[] getTextureVector() {
-        return textureToBuffer;
-    }
 
     public void refresh() {
         inum = getIPrime((int) (Math.random() * 19));

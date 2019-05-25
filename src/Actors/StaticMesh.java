@@ -38,7 +38,7 @@ public class StaticMesh {
     private float scale = 1f;
     private int k = 0;
     private float[] rotations = new float[maxCount];
-    private float[] vertices, textures;
+    private float[] vertices, textures, normals;
     private VBOModel optModel;
     private Vector3f location = new Vector3f(0f, 0f, 0f);
 
@@ -102,11 +102,16 @@ public class StaticMesh {
 
     private void convertToVBO(Model m) {
         vertices = new float[m.getFaces().size() * 3 * 3];
+        normals = new float[m.getFaces().size() * 3 * 3];
         textures = new float[m.getFaces().size() * 3 * 2];
         int flagV = 0, flagT = 0;
 
         for (Model.Face face : m.getFaces()) {
 
+            Vector3f n1 = m.getNormals().get(face.getNormalIndices()[0] - 1);
+            normals[flagV] = n1.x;
+            normals[flagV + 1] = n1.y;
+            normals[flagV + 2] = n1.z;
             if (m.hasTextureCoordinates()) {
                 Vector2f t1 = m.getTextureCoordinates().get(face.getTextureCoordinateIndices()[0] - 1);
                 textures[flagT] = t1.x;
@@ -120,6 +125,10 @@ public class StaticMesh {
             vertices[flagV + 2] = v1.z + location.z;
             flagV += 3;
 
+            Vector3f n2 = m.getNormals().get(face.getNormalIndices()[1] - 1);
+            normals[flagV] = n2.x;
+            normals[flagV + 1] = n2.y;
+            normals[flagV + 2] = n2.z;
             if (m.hasTextureCoordinates()) {
                 Vector2f t2 = m.getTextureCoordinates().get(face.getTextureCoordinateIndices()[1] - 1);
                 textures[flagT] = t2.x;
@@ -131,6 +140,11 @@ public class StaticMesh {
             vertices[flagV + 1] = v2.y + location.y;
             vertices[flagV + 2] = v2.z + location.z;
             flagV += 3;
+
+            Vector3f n3 = m.getNormals().get(face.getNormalIndices()[2] - 1);
+            normals[flagV] = n3.x;
+            normals[flagV + 1] = n3.y;
+            normals[flagV + 2] = n3.z;
 
             if (m.hasTextureCoordinates()) {
                 Vector2f t3 = m.getTextureCoordinates().get(face.getTextureCoordinateIndices()[2] - 1);
@@ -144,7 +158,7 @@ public class StaticMesh {
             vertices[flagV + 2] = v3.z + location.z;
             flagV += 3;
         }
-        optModel = new VBOModel(vertices, textures);
+        optModel = new VBOModel(vertices, normals, textures);
     }
 
     public void drawVBO() {
