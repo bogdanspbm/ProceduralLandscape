@@ -14,12 +14,34 @@ import org.newdawn.slick.opengl.TextureLoader;
 
 public class Terrain {
 
-    private PelenNoise noise = new PelenNoise(2, 100);
+    private PelenNoise noise;
     private VBOModel terrainModel;
     private Texture texture;
     float[] vertices, textures;
 
     public Terrain() {
+        noise = new PelenNoise(2, 100);
+        vertices = noise.getVerticesVector();
+        makeTexturesVector();
+        terrainModel = new VBOModel(vertices, textures);
+        try {
+            texture = TextureLoader.getTexture("tga", new FileInputStream(new File("res/textures/TerrainTexture.tga")));
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(Skybox.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(Skybox.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public void refresh() {
+        noise.refresh();
+        vertices = noise.getVerticesVector();
+        makeTexturesVector();
+        terrainModel = new VBOModel(vertices, textures);
+    }
+
+    public Terrain(int scaler, int size, float height) {
+        noise = new PelenNoise(scaler, size, height);
         vertices = noise.getVerticesVector();
         makeTexturesVector();
         terrainModel = new VBOModel(vertices, textures);
@@ -75,7 +97,7 @@ public class Terrain {
 
     public void draw() {
         texture.bind();
-        terrainModel.render();
+        terrainModel.renderTextured();
     }
 
 }

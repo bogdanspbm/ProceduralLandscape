@@ -12,6 +12,7 @@ public final class PelenNoise {
     private float defaultFreq = 0.15f;
     private float defaultAmplitude = 8f;
     private float defaultPersis = 0.2f;
+    private float height = 4f;
     private int inum = 1;
     private int NUM_OCTAVES = 50;
     float seed = (float) (Math.PI * 2 * 10 * (1 + Math.random()));
@@ -24,6 +25,15 @@ public final class PelenNoise {
 
     public PelenNoise(float scaler, int size) {
         this.cellCount = size;
+        this.scaler = scaler;
+        verticesToBuffer = new float[(cellCount - 1) * (cellCount - 1) * 18];
+        verticesMatrix = new Vector3f[cellCount][cellCount];
+        refresh();
+    }
+    
+     public PelenNoise(float scaler, int size, float height) {
+        this.cellCount = size;
+        this.height = height;
         this.scaler = scaler;
         verticesToBuffer = new float[(cellCount - 1) * (cellCount - 1) * 18];
         verticesMatrix = new Vector3f[cellCount][cellCount];
@@ -222,7 +232,7 @@ public final class PelenNoise {
         for (int i = 0; i < cellCount; i++) {
             for (int j = 0; j < cellCount; j++) {
                 //проходим по всем элементам массива и заполняем их значениями   
-                verticesMatrix[i][j].y = 4f * perlinNoise2D((float) i / 2, (float) j / 2, fac) / scaler;
+                verticesMatrix[i][j].y = height * perlinNoise2D((float) verticesMatrix[i][j].x, verticesMatrix[i][j].z, fac) / scaler;
             }
         }
     }

@@ -3,11 +3,13 @@ package Actors;
 import Utils3D.Stereometry;
 import java.nio.FloatBuffer;
 import org.lwjgl.BufferUtils;
+import static org.lwjgl.opengl.GL11.GL_COLOR_ARRAY;
 import static org.lwjgl.opengl.GL11.GL_FLOAT;
 import static org.lwjgl.opengl.GL11.GL_NORMAL_ARRAY;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_COORD_ARRAY;
 import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
 import static org.lwjgl.opengl.GL11.GL_VERTEX_ARRAY;
+import static org.lwjgl.opengl.GL11.glColorPointer;
 import static org.lwjgl.opengl.GL11.glDisableClientState;
 import static org.lwjgl.opengl.GL11.glDrawArrays;
 import static org.lwjgl.opengl.GL11.glEnableClientState;
@@ -27,6 +29,7 @@ public class VBOModel {
     private int v_id;
     private int t_id;
     private int n_id;
+    private int mode = 0;
 
     public VBOModel(float[] vertices, float[] text_coords) {
         draw_count = vertices.length;
@@ -45,7 +48,26 @@ public class VBOModel {
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
-    
+
+    public VBOModel(float[] vertices, float[] colorFill, int mode) {
+        this.mode = mode;
+        draw_count = vertices.length;
+        v_id = glGenBuffers();
+
+        glBindBuffer(GL_ARRAY_BUFFER, v_id);
+        glBufferData(GL_ARRAY_BUFFER, createBuffer(vertices), GL_STATIC_DRAW);
+
+        t_id = glGenBuffers();
+        glBindBuffer(GL_ARRAY_BUFFER, t_id);
+        glBufferData(GL_ARRAY_BUFFER, createBuffer(colorFill), GL_STATIC_DRAW);
+
+        n_id = glGenBuffers();
+        glBindBuffer(GL_ARRAY_BUFFER, n_id);
+        glBufferData(GL_ARRAY_BUFFER, createBuffer(generateNormals(vertices)), GL_STATIC_DRAW);
+
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
+
     public VBOModel(float[] vertices, float[] normals, float[] text_coords) {
         draw_count = vertices.length;
         v_id = glGenBuffers();
@@ -64,7 +86,8 @@ public class VBOModel {
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
-    public void render() {
+    public void renderTextured() {
+
         glEnableClientState(GL_VERTEX_ARRAY);
         glEnableClientState(GL_TEXTURE_COORD_ARRAY);
         glEnableClientState(GL_NORMAL_ARRAY);
@@ -84,6 +107,29 @@ public class VBOModel {
 
         glDisableClientState(GL_VERTEX_ARRAY);
         glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+        glDisableClientState(GL_NORMAL_ARRAY);
+    }
+
+    public void renderColored() {
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glEnableClientState(GL_COLOR_ARRAY);
+        glEnableClientState(GL_NORMAL_ARRAY);
+
+        glBindBuffer(GL_ARRAY_BUFFER, v_id);
+        glVertexPointer(3, GL_FLOAT, 0, 0);
+
+        glBindBuffer(GL_ARRAY_BUFFER, t_id);
+        glColorPointer(4, GL_FLOAT, 0, 0);
+
+        glBindBuffer(GL_ARRAY_BUFFER, n_id);
+        glNormalPointer(GL_FLOAT, 0, 0);
+
+        glDrawArrays(GL_TRIANGLES, 0, draw_count);
+
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+        glDisableClientState(GL_VERTEX_ARRAY);
+        glDisableClientState(GL_COLOR_ARRAY);
         glDisableClientState(GL_NORMAL_ARRAY);
     }
 

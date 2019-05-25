@@ -1,5 +1,5 @@
-varying vec3 color;
+#version 120
 
 void main() {
-    gl_FragColor = vec4(color, 1);
+    gl_FragColor = vec4(1,0,0, 1);
 }

@@ -1,11 +1,11 @@
 package Main;
 
 import Landscape.LowPolyOcean;
+import Landscape.Ocean;
 import Landscape.PelenNoise;
 import Landscape.Skybox;
 import Landscape.Terrain;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import Shaders.Shader;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 import static org.lwjgl.opengl.GL11.glTranslatef;
@@ -13,15 +13,15 @@ import static org.lwjgl.opengl.GL11.glTranslatef;
 public class Game {
 
     public final Camera cam;
-    private LowPolyOcean ocean = new LowPolyOcean();
-    //private PelenNoise biom = new PelenNoise();
-    private Terrain landscape = new Terrain();
+    private PelenNoise biom = new PelenNoise();
+    private Terrain landscape = new Terrain(2, 200, 4f);
     private Skybox skySphere = new Skybox();
+    private Ocean ocean = new Ocean(2, 200, 0.5f);
+    private Shader shader = new Shader("shader");
     int i = 0;
 
     public Game() {
         cam = new Camera(20, 20, 20); // Cоздаем камеру с координатами x=0, y = 1, z = 5;
-        //ocean.setGeneration(biom.getNoiseMat(), biom.getSize());
 
     }
 
@@ -36,13 +36,12 @@ public class Game {
         glTranslatef(-cam.getPos().x, -cam.getPos().y, -cam.getPos().z); // Ставлю координаты в пространтсве
 
         if (Keyboard.isKeyDown(Keyboard.KEY_R)) { // Обновляю шум
-            //biom.refresh();
-           // ocean.setGeneration(biom.getNoiseMat(), biom.getSize());
-
+            landscape.refresh();
         }
 
         landscape.draw();
         skySphere.draw();
+        ocean.draw();
 
     }
 }

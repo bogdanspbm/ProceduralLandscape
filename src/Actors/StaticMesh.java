@@ -162,7 +162,7 @@ public class StaticMesh {
     }
 
     public void drawVBO() {
-        optModel.render();
+        optModel.renderTextured();
     }
 
     public StaticMesh(String[] fileName) {
