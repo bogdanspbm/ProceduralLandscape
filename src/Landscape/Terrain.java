@@ -1,7 +1,10 @@
 package Landscape;
 
+import Actors.StaticMesh;
 import Actors.VBOModel;
 import Utils3D.Stereometry;
+import static Utils3D.Stereometry.calcNormal;
+import static Utils3D.Stereometry.getVectorWorldDegree;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -17,34 +20,31 @@ public class Terrain {
     private PelenNoise noise;
     private VBOModel terrainModel;
     private Texture texture;
+    StaticMesh trees;
     float[] vertices, textures;
 
     public Terrain() {
-        noise = new PelenNoise(2, 100);
-        vertices = noise.getVerticesVector();
-        makeTexturesVector();
-        terrainModel = new VBOModel(vertices, textures);
-        try {
-            texture = TextureLoader.getTexture("tga", new FileInputStream(new File("res/textures/TerrainTexture.tga")));
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(Skybox.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(Skybox.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        refresh();
+        loadTexture();
     }
 
-    public void refresh() {
+    public final void refresh() {
+        int grassCount;
         noise.refresh();
         vertices = noise.getVerticesVector();
         makeTexturesVector();
         terrainModel = new VBOModel(vertices, textures);
+        grassCount = calcGrassPlacesCount();
+        genFoliage(grassCount);
     }
 
     public Terrain(int scaler, int size, float height) {
         noise = new PelenNoise(scaler, size, height);
-        vertices = noise.getVerticesVector();
-        makeTexturesVector();
-        terrainModel = new VBOModel(vertices, textures);
+        refresh();
+        loadTexture();
+    }
+
+    private void loadTexture() {
         try {
             texture = TextureLoader.getTexture("tga", new FileInputStream(new File("res/textures/TerrainTexture.tga")));
         } catch (FileNotFoundException ex) {
@@ -95,9 +95,53 @@ public class Terrain {
         return normal;
     }
 
+    private void genFoliage(int count) {
+        Vector3f[] locations = new Vector3f[count];
+        int flag = 0;
+        for (int i = 0; i < vertices.length; i += 9) {
+            if (canPlaceGrass(i)) {
+                locations[flag] = new Vector3f(vertices[i], vertices[i + 1], vertices[i + 2]);
+                flag += 1;
+            }
+        }
+        trees = new StaticMesh("res/models/Grass.obj", locations);
+    }
+
+    private int calcGrassPlacesCount() {
+        int i = 0;
+        for (int k = 0; k < vertices.length; k += 9) {
+            if (canPlaceGrass(k)) {
+                i += 1;
+            }
+        }
+        System.out.println(i + " count");
+        return i;
+    }
+
+    private boolean canPlaceGrass(int index) {
+        boolean flag = false;
+        int startIndex = index;
+        float degree;
+
+        Vector3f a, b, c;
+
+        a = new Vector3f(vertices[startIndex], vertices[startIndex + 1], vertices[startIndex + 2]);
+        b = new Vector3f(vertices[startIndex + 3], vertices[startIndex + 4], vertices[startIndex + 5]);
+        c = new Vector3f(vertices[startIndex + 6], vertices[startIndex + 7], vertices[startIndex + 8]);
+
+        degree = getVectorWorldDegree(calcNormal(a, b, c));
+
+        if (a.y > 0.5f && degree < 0.7f) {
+            flag = true;
+        }
+
+        return flag;
+    }
+
     public void draw() {
         texture.bind();
         terrainModel.renderTextured();
+        trees.drawVBO();
     }
 
 }

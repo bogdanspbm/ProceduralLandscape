@@ -41,6 +41,7 @@ public class StaticMesh {
     private float[] vertices, textures, normals;
     private VBOModel optModel;
     private Vector3f location = new Vector3f(0f, 0f, 0f);
+    private Vector3f[] locations;
 
     public StaticMesh(String[] fileName, String fileName2) {
         m = new Model[fileName.length];
@@ -89,6 +90,23 @@ public class StaticMesh {
             this.location = location;
             m[0] = OBJLoader.loadTexturedModel(new File(fileName));
             convertToVBO(m[0]);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            Display.destroy();
+            System.exit(1);
+        } catch (IOException e) {
+            e.printStackTrace();
+            Display.destroy();
+            System.exit(1);
+        }
+    }
+
+    public StaticMesh(String fileName, Vector3f[] locations) {
+        m = new Model[1];
+        try {
+            this.locations = locations;
+            m[0] = OBJLoader.loadTexturedModel(new File(fileName));
+            convertToVBOMany(m[0]);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             Display.destroy();
@@ -157,6 +175,71 @@ public class StaticMesh {
             vertices[flagV + 1] = v3.y + location.y;
             vertices[flagV + 2] = v3.z + location.z;
             flagV += 3;
+        }
+        optModel = new VBOModel(vertices, normals, textures);
+    }
+
+    private void convertToVBOMany(Model m) {
+        vertices = new float[m.getFaces().size() * 3 * 3 * locations.length];
+        normals = new float[m.getFaces().size() * 3 * 3 * locations.length];
+        textures = new float[m.getFaces().size() * 3 * 2 * locations.length];
+        int flagV = 0, flagT = 0;
+
+        for (int i = 0; i < locations.length; i++) {
+            location = locations[i];
+            for (Model.Face face : m.getFaces()) {
+
+                Vector3f n1 = m.getNormals().get(face.getNormalIndices()[0] - 1);
+                normals[flagV] = n1.x;
+                normals[flagV + 1] = n1.y;
+                normals[flagV + 2] = n1.z;
+                if (m.hasTextureCoordinates()) {
+                    Vector2f t1 = m.getTextureCoordinates().get(face.getTextureCoordinateIndices()[0] - 1);
+                    textures[flagT] = t1.x;
+                    textures[flagT + 1] = t1.y;
+                    flagT += 2;
+
+                }
+                Vector3f v1 = m.getVertices().get(face.getVertexIndices()[0] - 1);
+                vertices[flagV] = v1.x + location.x;
+                vertices[flagV + 1] = v1.y + location.y;
+                vertices[flagV + 2] = v1.z + location.z;
+                flagV += 3;
+
+                Vector3f n2 = m.getNormals().get(face.getNormalIndices()[1] - 1);
+                normals[flagV] = n2.x;
+                normals[flagV + 1] = n2.y;
+                normals[flagV + 2] = n2.z;
+                if (m.hasTextureCoordinates()) {
+                    Vector2f t2 = m.getTextureCoordinates().get(face.getTextureCoordinateIndices()[1] - 1);
+                    textures[flagT] = t2.x;
+                    textures[flagT + 1] = t2.y;
+                    flagT += 2;
+                }
+                Vector3f v2 = m.getVertices().get(face.getVertexIndices()[1] - 1);
+                vertices[flagV] = v2.x + location.x;
+                vertices[flagV + 1] = v2.y + location.y;
+                vertices[flagV + 2] = v2.z + location.z;
+                flagV += 3;
+
+                Vector3f n3 = m.getNormals().get(face.getNormalIndices()[2] - 1);
+                normals[flagV] = n3.x;
+                normals[flagV + 1] = n3.y;
+                normals[flagV + 2] = n3.z;
+
+                if (m.hasTextureCoordinates()) {
+                    Vector2f t3 = m.getTextureCoordinates().get(face.getTextureCoordinateIndices()[2] - 1);
+                    textures[flagT] = t3.x;
+                    textures[flagT + 1] = t3.y;
+                    flagT += 2;
+                }
+                Vector3f v3 = m.getVertices().get(face.getVertexIndices()[2] - 1);
+                vertices[flagV] = v3.x + location.x;
+                vertices[flagV + 1] = v3.y + location.y;
+                vertices[flagV + 2] = v3.z + location.z;
+                
+                flagV += 3;
+            }
         }
         optModel = new VBOModel(vertices, normals, textures);
     }
