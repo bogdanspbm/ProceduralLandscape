@@ -20,7 +20,8 @@ public class Terrain {
     private PelenNoise noise, biom;
     private VBOModel terrainModel;
     private Texture textureLand, textureGrass, texturePine, textureBush, textureTree, textureViking;
-    StaticMesh grass, pine, bushWinter, tree, treeB, logA, bushA, stoneA, stoneB, stoneC, plantA, MushroomA, flowerA, boat;
+    private Vector3f[] locationsTower = new Vector3f[5], locationsHouse = new Vector3f[5];
+    StaticMesh grass, pine, bushWinter, tree, treeB, logA, bushA, stoneA, stoneB, stoneC, plantA, MushroomA, flowerA, boat, tower, house, spike;
     float[] vertices, textures;
 
     public Terrain() {
@@ -55,9 +56,23 @@ public class Terrain {
         bushA.enableRandomText();
         bushA.convertToVBOMany();
 
+        // Tower Building 
+        System.arraycopy(noise.getBuldingLocations(), 0, locationsTower, 0, 5);
+        System.arraycopy(noise.getBuldingLocations(), 5, locationsHouse, 0, 5);
+
+        tower = new StaticMesh("res/models/Tower.obj", locationsTower, 0.35f);
+        tower.convertToVBOMany();
+
+        house = new StaticMesh("res/models/House.obj", locationsHouse, 0.35f);
+        house.convertToVBOMany();
+
         // Summer MushRoom A
         MushroomA = new StaticMesh("res/models/MushroomA.obj", genRandomFoliage(100, 1000, 0), 0.5f);
         MushroomA.convertToVBOMany();
+
+        // Summer Spike
+        spike = new StaticMesh("res/models/Spike.obj", genRandomFoliage(100, 1000, 2), 0.3f);
+        spike.convertToVBOMany();
 
         // Summer Flower A
         flowerA = new StaticMesh("res/models/FlowerA.obj", genRandomFoliage(500, 1000, 0), 0.5f);
@@ -277,7 +292,7 @@ public class Terrain {
         }
         float degree;
 
-        if (curBiom != biom) {
+        if (curBiom != biom && biom != 2) {
             return false;
         }
 
@@ -338,6 +353,9 @@ public class Terrain {
 
         textureViking.bind();
         boat.drawVBO();
+        tower.drawVBO();
+        house.drawVBO();
+        spike.drawVBO();
 
         textureBush.bind();
         bushWinter.drawVBO();

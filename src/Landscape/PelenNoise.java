@@ -1,6 +1,7 @@
 package Landscape;
 
 import static Utils3D.Draw3D.matrixToFlat;
+import Utils3D.Stereometry;
 import org.lwjgl.util.vector.Vector3f;
 
 public final class PelenNoise {
@@ -13,6 +14,7 @@ public final class PelenNoise {
     private float defaultAmplitude = 8f;
     private float defaultPersis = 0.2f;
     private float height = 4f;
+    private Vector3f[] buildingLocations;
     private int inum = 1;
     private int NUM_OCTAVES = 50;
     float seed = (float) (Math.PI * 2 * 10 * (1 + Math.random()));
@@ -30,14 +32,43 @@ public final class PelenNoise {
         verticesMatrix = new Vector3f[cellCount][cellCount];
         refresh();
     }
-    
-     public PelenNoise(float scaler, int size, float height) {
+
+    public PelenNoise(float scaler, int size, float height) {
         this.cellCount = size;
         this.height = height;
         this.scaler = scaler;
         verticesToBuffer = new float[(cellCount - 1) * (cellCount - 1) * 18];
         verticesMatrix = new Vector3f[cellCount][cellCount];
         refresh();
+    }
+
+    private void genBuildingIndices(int count, int maxDepth) {
+        buildingLocations = new Vector3f[count];
+        int x, y, curDepth = 0, flag = 0;
+        while (flag < count) {
+            x = (int) (Math.random() * (cellCount - 1));
+            y = (int) (Math.random() * (cellCount - 1));
+
+            if (verticesMatrix[x][y].y > 1f) {
+                if (Stereometry.calcNormal(verticesMatrix[x][y], verticesMatrix[x + 1][y], verticesMatrix[x][y + 1]).y < 0.5f) {
+                    flatZone(x, y, 2);
+                    buildingLocations[flag] = new Vector3f(verticesMatrix[x][y].x, verticesMatrix[x][y].y, verticesMatrix[x][y].z);
+                    flag++;
+                } else {
+                    System.out.println(Stereometry.calcNormal(verticesMatrix[x][y], verticesMatrix[x + 1][y], verticesMatrix[x + 1][y + 1]).y);
+                    
+                }
+            }
+            curDepth++;
+            if (curDepth >= maxDepth) {
+                buildingLocations[flag] = new Vector3f(0, 0, 0);
+                flag++;
+            }
+        }
+    }
+
+    public Vector3f[] getBuldingLocations() {
+        return buildingLocations;
     }
 
     private void matToVector() {
@@ -58,8 +89,6 @@ public final class PelenNoise {
                 verticesToBuffer[counterV] = c;
                 counterV++;
 
-
-
                 a = verticesMatrix[i][k + 1].x;
                 b = verticesMatrix[i][k + 1].y;
                 c = verticesMatrix[i][k + 1].z;
@@ -70,8 +99,6 @@ public final class PelenNoise {
                 counterV++;
                 verticesToBuffer[counterV] = c;
                 counterV++;
-
-
 
                 a = verticesMatrix[i + 1][k].x;
                 b = verticesMatrix[i + 1][k].y;
@@ -84,8 +111,6 @@ public final class PelenNoise {
                 verticesToBuffer[counterV] = c;
                 counterV++;
 
-
-
                 a = verticesMatrix[i][k + 1].x;
                 b = verticesMatrix[i][k + 1].y;
                 c = verticesMatrix[i][k + 1].z;
@@ -96,18 +121,16 @@ public final class PelenNoise {
                 verticesToBuffer[counterV] = c;
                 counterV++;
 
-
                 a = verticesMatrix[i + 1][k + 1].x;
                 b = verticesMatrix[i + 1][k + 1].y;
                 c = verticesMatrix[i + 1][k + 1].z;
-                
+
                 verticesToBuffer[counterV] = a;
                 counterV++;
                 verticesToBuffer[counterV] = b;
                 counterV++;
                 verticesToBuffer[counterV] = c;
                 counterV++;
-
 
                 a = verticesMatrix[i + 1][k].x;
                 b = verticesMatrix[i + 1][k].y;
@@ -120,7 +143,7 @@ public final class PelenNoise {
                 verticesToBuffer[counterV] = c;
                 counterV++;
             }
-            
+
         }
         System.out.println(counterV);
     }
@@ -146,11 +169,11 @@ public final class PelenNoise {
         return verticesToBuffer;
     }
 
-
     public void refresh() {
         inum = getIPrime((int) (Math.random() * 19));
         fillZerosVerticesMatrix();
         genNoise();
+        genBuildingIndices(10, 1000);
         matToVector();
     }
 
