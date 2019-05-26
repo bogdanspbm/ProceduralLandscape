@@ -17,7 +17,7 @@ import org.newdawn.slick.opengl.TextureLoader;
 
 public class Terrain {
 
-    private PelenNoise noise;
+    private PelenNoise noise, biom;
     private VBOModel terrainModel;
     private Texture textureLand, textureGrass, texturePine;
     StaticMesh grass, tree;
@@ -34,15 +34,16 @@ public class Terrain {
         vertices = noise.getVerticesVector();
         makeTexturesVector();
         terrainModel = new VBOModel(vertices, textures);
-        grassCount = calcGrassPlacesCount();
-        grass = new StaticMesh("res/models/Grass.obj", genFoliage(grassCount), 0.5f);
+        grassCount = calcGrassPlacesCount(3, 0);
+        grass = new StaticMesh("res/models/Grass.obj", genFoliage(grassCount, 3, 0), 0.5f);
         grass.enableRandomText();
         grass.convertToVBOMany();
-        tree = new StaticMesh("res/models/PineA.obj", genRandomFoliage(100, 1000), 0.3f);
+        tree = new StaticMesh("res/models/PineA.obj", genRandomFoliage(100, 1000, 1), 0.7f);
         tree.convertToVBOMany();
     }
 
-    public Terrain(int scaler, int size, float height) {
+    public Terrain(float scaler, int size, float height, PelenNoise biom) {
+        this.biom = biom;
         noise = new PelenNoise(scaler, size, height);
         refresh();
         loadTexture();
@@ -70,14 +71,23 @@ public class Terrain {
             height = vertices[i + 1];
             degree = Stereometry.getVectorWorldDegree(getNormalByIndex(i));
             if (height < 0.5) {
+                //sand
                 textures[flag] = Math.abs(vertices[i] / 5) % 0.5f;
                 textures[flag + 1] = Math.abs(vertices[i + 2] / 5) % 0.5f + 0.5f;
 
             } else {
                 if (degree < 0.7f) {
-                    textures[flag] = Math.abs(vertices[i] / 5) % 0.5f;
-                    textures[flag + 1] = Math.abs(vertices[i + 2] / 5) % 0.5f;
+                    if (biom.getVerticesVector()[i + 1] < 0.5f) {
+                        //grass
+                        textures[flag] = Math.abs(vertices[i] / 5) % 0.5f;
+                        textures[flag + 1] = Math.abs(vertices[i + 2] / 5) % 0.5f;
+                    } else {
+                        //snow
+                        textures[flag] = Math.abs(vertices[i] / 5) % 0.5f + 0.5f;
+                        textures[flag + 1] = Math.abs(vertices[i + 2] / 5) % 0.5f;
+                    }
                 } else {
+                    //cliff
                     textures[flag] = Math.abs(vertices[i] / 5) % 0.5f + 0.5f;
                     textures[flag + 1] = Math.abs(vertices[i + 2] / 5) % 0.5f + 0.5f;
                 }
@@ -101,11 +111,11 @@ public class Terrain {
         return normal;
     }
 
-    private Vector3f[] genFoliage(int count) {
+    private Vector3f[] genFoliage(int count, int biom) {
         Vector3f[] locations = new Vector3f[count];
         int flag = 0;
         for (int i = 0; i < vertices.length; i += 9) {
-            if (canPlaceFoliage(i)) {
+            if (canPlaceFoliage(i, biom)) {
                 locations[flag] = new Vector3f(vertices[i], vertices[i + 1] - 0.2f, vertices[i + 2]);
                 flag += 1;
             }
@@ -113,7 +123,19 @@ public class Terrain {
         return locations;
     }
 
-    private Vector3f[] genRandomFoliage(int count, int maxDepth) {
+    private Vector3f[] genFoliage(int count, int toSkip, int biom) {
+        Vector3f[] locations = new Vector3f[count];
+        int flag = 0;
+        for (int i = 0; i < vertices.length; i += 9 * (toSkip + 1)) {
+            if (canPlaceFoliage(i, biom)) {
+                locations[flag] = new Vector3f(vertices[i], vertices[i + 1] - 0.2f, vertices[i + 2]);
+                flag += 1;
+            }
+        }
+        return locations;
+    }
+
+    private Vector3f[] genRandomFoliage(int count, int maxDepth, int biom) {
         Vector3f[] locations = new Vector3f[count];
         int flag = 0;
         int dl;
@@ -121,7 +143,7 @@ public class Terrain {
         while (flag < count) {
             dl = (int) (Math.random() * (vertices.length - 1));
             dl = dl - dl % 9;
-            if (canPlaceFoliage(dl) == true) {
+            if (canPlaceFoliage(dl, biom) == true) {
                 locations[flag] = new Vector3f(vertices[dl], vertices[dl + 1], vertices[dl + 2]);
                 flag++;
 
@@ -136,10 +158,10 @@ public class Terrain {
         return locations;
     }
 
-    private int calcGrassPlacesCount() {
+    private int calcGrassPlacesCount(int toSkip, int biom) {
         int i = 0;
-        for (int k = 0; k < vertices.length; k += 9) {
-            if (canPlaceFoliage(k)) {
+        for (int k = 0; k < vertices.length; k += 9 * (toSkip + 1)) {
+            if (canPlaceFoliage(k, biom)) {
                 i += 1;
             }
         }
@@ -147,10 +169,20 @@ public class Terrain {
         return i;
     }
 
-    private boolean canPlaceFoliage(int index) {
+    private boolean canPlaceFoliage(int index, int biom) {
         boolean flag = false;
         int startIndex = index;
+        int curBiom;
+        if (this.biom.getVerticesVector()[index + 1] > 0.5f) {
+            curBiom = 1;
+        } else {
+            curBiom = 0;
+        }
         float degree;
+
+        if (curBiom != biom) {
+            return false;
+        }
 
         Vector3f a, b, c;
 

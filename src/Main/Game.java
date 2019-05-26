@@ -13,10 +13,12 @@ import static org.lwjgl.opengl.GL11.glTranslatef;
 public class Game {
 
     public final Camera cam;
-    private PelenNoise biom = new PelenNoise();
-    private Terrain landscape = new Terrain(2, 200, 4f);
+    private int size = 200;
+    private float scaler = 2;
+    private PelenNoise biom = new PelenNoise(scaler, size, 2f);
+    private Terrain landscape = new Terrain(scaler, size, 4f, biom);
     private Skybox skySphere = new Skybox();
-    private Ocean ocean = new Ocean(2, 200, 0.5f);
+    private Ocean ocean = new Ocean(scaler, size, 0.5f, biom);
     private Shader shader = new Shader("shader");
     int i = 0;
 
@@ -36,11 +38,11 @@ public class Game {
         glTranslatef(-cam.getPos().x, -cam.getPos().y, -cam.getPos().z); // Ставлю координаты в пространтсве
 
         if (Keyboard.isKeyDown(Keyboard.KEY_R)) { // Обновляю шум
+            biom.refresh();
             landscape.refresh();
         }
-
+        //ocean.draw();   
         skySphere.draw();
-        ocean.draw();
         landscape.draw();
     }
 }
