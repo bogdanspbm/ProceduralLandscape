@@ -10,7 +10,7 @@ public class Camera {
 
     private Vector3f pos; // Координаты
     private Vector2f rotation; // Поворот
-    private final int SPEED = 60; // Cкорость полета камеры
+    private final int SPEED = 30; // Cкорость полета камеры
 
     public Camera(float x, float y, float z) {
         pos = new Vector3f(x, y, z); // Ставлю начальные коорды

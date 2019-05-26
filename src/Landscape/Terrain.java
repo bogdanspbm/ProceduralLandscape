@@ -19,8 +19,8 @@ public class Terrain {
 
     private PelenNoise noise;
     private VBOModel terrainModel;
-    private Texture textureLand, textureGrass;
-    StaticMesh trees;
+    private Texture textureLand, textureGrass, texturePine;
+    StaticMesh grass, tree;
     float[] vertices, textures;
 
     public Terrain() {
@@ -35,7 +35,11 @@ public class Terrain {
         makeTexturesVector();
         terrainModel = new VBOModel(vertices, textures);
         grassCount = calcGrassPlacesCount();
-        genFoliage(grassCount);
+        grass = new StaticMesh("res/models/Grass.obj", genFoliage(grassCount), 0.5f);
+        grass.enableRandomText();
+        grass.convertToVBOMany();
+        tree = new StaticMesh("res/models/PineA.obj", genRandomFoliage(100, 1000), 0.3f);
+        tree.convertToVBOMany();
     }
 
     public Terrain(int scaler, int size, float height) {
@@ -48,6 +52,7 @@ public class Terrain {
         try {
             textureLand = TextureLoader.getTexture("tga", new FileInputStream(new File("res/textures/TerrainTexture.tga")));
             textureGrass = TextureLoader.getTexture("tga", new FileInputStream(new File("res/textures/T_PolygonNature_01.tga")));
+            texturePine = TextureLoader.getTexture("png", new FileInputStream(new File("res/textures/PineA.png")));
         } catch (FileNotFoundException ex) {
             Logger.getLogger(Skybox.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
@@ -96,22 +101,45 @@ public class Terrain {
         return normal;
     }
 
-    private void genFoliage(int count) {
+    private Vector3f[] genFoliage(int count) {
         Vector3f[] locations = new Vector3f[count];
         int flag = 0;
         for (int i = 0; i < vertices.length; i += 9) {
-            if (canPlaceGrass(i)) {
+            if (canPlaceFoliage(i)) {
                 locations[flag] = new Vector3f(vertices[i], vertices[i + 1] - 0.2f, vertices[i + 2]);
                 flag += 1;
             }
         }
-        trees = new StaticMesh("res/models/Grass.obj", locations, 0.5f);
+        return locations;
+    }
+
+    private Vector3f[] genRandomFoliage(int count, int maxDepth) {
+        Vector3f[] locations = new Vector3f[count];
+        int flag = 0;
+        int dl;
+        int curDepth = 0;
+        while (flag < count) {
+            dl = (int) (Math.random() * (vertices.length - 1));
+            dl = dl - dl % 9;
+            if (canPlaceFoliage(dl) == true) {
+                locations[flag] = new Vector3f(vertices[dl], vertices[dl + 1], vertices[dl + 2]);
+                flag++;
+
+            }
+            curDepth++;
+            if (curDepth >= maxDepth) {
+                Vector3f[] locationsShort = new Vector3f[flag];
+                System.arraycopy(locations, 0, locationsShort, 0, locationsShort.length);
+                return locationsShort;
+            }
+        }
+        return locations;
     }
 
     private int calcGrassPlacesCount() {
         int i = 0;
         for (int k = 0; k < vertices.length; k += 9) {
-            if (canPlaceGrass(k)) {
+            if (canPlaceFoliage(k)) {
                 i += 1;
             }
         }
@@ -119,7 +147,7 @@ public class Terrain {
         return i;
     }
 
-    private boolean canPlaceGrass(int index) {
+    private boolean canPlaceFoliage(int index) {
         boolean flag = false;
         int startIndex = index;
         float degree;
@@ -143,7 +171,9 @@ public class Terrain {
         textureLand.bind();
         terrainModel.renderTextured();
         textureGrass.bind();
-        trees.drawVBO();
+        grass.drawVBO();
+        texturePine.bind();
+        tree.drawVBO();
     }
 
 }

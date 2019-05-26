@@ -39,9 +39,8 @@ public class Game {
             landscape.refresh();
         }
 
-        landscape.draw();
         skySphere.draw();
         ocean.draw();
-
+        landscape.draw();
     }
 }

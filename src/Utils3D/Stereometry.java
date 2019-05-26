@@ -1,5 +1,6 @@
 package Utils3D;
 
+import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 
 public class Stereometry {
@@ -46,6 +47,16 @@ public class Stereometry {
         res.x = (float) (vec.x * Math.cos(angle) - vec.z * Math.sin(angle));
         res.z = (float) (vec.x * Math.sin(angle) + vec.z * Math.cos(angle));
         res.y = vec.y;
+        return res;
+    }
+    
+    public static Vector2f rotateVector2DY(Vector2f vec, float angle) {
+        if (angle == 0) {
+            return vec;
+        }
+        Vector2f res = new Vector2f();
+        res.x = (float) (vec.x * Math.cos(angle) - vec.y * Math.sin(angle));
+        res.y = (float) (vec.x * Math.sin(angle) + vec.y * Math.cos(angle));
         return res;
     }
 

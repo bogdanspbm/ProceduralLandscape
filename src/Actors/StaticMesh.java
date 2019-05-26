@@ -29,7 +29,7 @@ import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureLoader;
 
 public class StaticMesh {
-
+    
     private Model[] m;
     Texture texture;
     private boolean hasText = false;
@@ -43,7 +43,8 @@ public class StaticMesh {
     private VBOModel optModel;
     private Vector3f location = new Vector3f(0f, 0f, 0f);
     private Vector3f[] locations;
-
+    private boolean randText = false;
+    
     public StaticMesh(String[] fileName, String fileName2) {
         m = new Model[fileName.length];
         for (int i = 0; i < fileName.length; i++) {
@@ -68,7 +69,7 @@ public class StaticMesh {
             ex.printStackTrace();
         }
     }
-
+    
     public StaticMesh(String fileName) {
         m = new Model[1];
         try {
@@ -84,7 +85,7 @@ public class StaticMesh {
             System.exit(1);
         }
     }
-
+    
     public StaticMesh(String fileName, Vector3f location) {
         m = new Model[1];
         try {
@@ -101,13 +102,13 @@ public class StaticMesh {
             System.exit(1);
         }
     }
-
+    
     public StaticMesh(String fileName, Vector3f[] locations) {
         m = new Model[1];
         try {
             this.locations = locations;
             m[0] = OBJLoader.loadTexturedModel(new File(fileName));
-            convertToVBOMany(m[0]);
+            //convertToVBOMany(m[0]);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             Display.destroy();
@@ -118,14 +119,14 @@ public class StaticMesh {
             System.exit(1);
         }
     }
-
+    
     public StaticMesh(String fileName, Vector3f[] locations, float scale) {
         m = new Model[1];
         this.scale = scale;
         try {
             this.locations = locations;
             m[0] = OBJLoader.loadTexturedModel(new File(fileName));
-            convertToVBOMany(m[0]);
+            //convertToVBOMany(m[0]);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             Display.destroy();
@@ -136,15 +137,19 @@ public class StaticMesh {
             System.exit(1);
         }
     }
-
+    
+    public void convertToVBOMany() {
+        convertToVBOMany(m[0]);
+    }
+    
     private void convertToVBO(Model m) {
         vertices = new float[m.getFaces().size() * 3 * 3];
         normals = new float[m.getFaces().size() * 3 * 3];
         textures = new float[m.getFaces().size() * 3 * 2];
         int flagV = 0, flagT = 0;
-
+        
         for (Model.Face face : m.getFaces()) {
-
+            
             Vector3f n1 = m.getNormals().get(face.getNormalIndices()[0] - 1);
             normals[flagV] = n1.x;
             normals[flagV + 1] = n1.y;
@@ -154,14 +159,14 @@ public class StaticMesh {
                 textures[flagT] = t1.x;
                 textures[flagT + 1] = t1.y;
                 flagT += 2;
-
+                
             }
             Vector3f v1 = m.getVertices().get(face.getVertexIndices()[0] - 1);
             vertices[flagV] = v1.x * scale + location.x;
             vertices[flagV + 1] = v1.y * scale + location.y;
             vertices[flagV + 2] = v1.z * scale + location.z;
             flagV += 3;
-
+            
             Vector3f n2 = m.getNormals().get(face.getNormalIndices()[1] - 1);
             normals[flagV] = n2.x;
             normals[flagV + 1] = n2.y;
@@ -177,12 +182,12 @@ public class StaticMesh {
             vertices[flagV + 1] = v2.y * scale + location.y;
             vertices[flagV + 2] = v2.z * scale + location.z;
             flagV += 3;
-
+            
             Vector3f n3 = m.getNormals().get(face.getNormalIndices()[2] - 1);
             normals[flagV] = n3.x;
             normals[flagV + 1] = n3.y;
             normals[flagV + 2] = n3.z;
-
+            
             if (m.hasTextureCoordinates()) {
                 Vector2f t3 = m.getTextureCoordinates().get(face.getTextureCoordinateIndices()[2] - 1);
                 textures[flagT] = t3.x;
@@ -197,30 +202,36 @@ public class StaticMesh {
         }
         optModel = new VBOModel(vertices, normals, textures);
     }
-
+    
+    public void enableRandomText() {
+        randText = true;
+    }
+    
     private void convertToVBOMany(Model m) {
         vertices = new float[m.getFaces().size() * 3 * 3 * locations.length];
         normals = new float[m.getFaces().size() * 3 * 3 * locations.length];
         textures = new float[m.getFaces().size() * 3 * 2 * locations.length];
         float textCord = 0f, rotate = 0f;
         int flagV = 0, flagT = 0;
-
+        
         for (int i = 0; i < locations.length; i++) {
             location = locations[i];
             rotate = (float) Math.random() * 360;
-
-            if (Math.random() > 0.33f) {
-                if (Math.random() > 0.66f) {
-                    textCord = 0.1f;
+            
+            if (randText == true) {
+                if (Math.random() > 0.33f) {
+                    if (Math.random() > 0.66f) {
+                        textCord = 0.1f;
+                    } else {
+                        textCord = 0.5f;
+                    }
                 } else {
-                    textCord = 0.5f;
+                    textCord = 0f;
                 }
-            } else {
-                textCord = 0f;
             }
-
+            
             for (Model.Face face : m.getFaces()) {
-
+                
                 Vector3f n1 = rotateVectorY(m.getNormals().get(face.getNormalIndices()[0] - 1), rotate);
                 normals[flagV] = n1.x;
                 normals[flagV + 1] = n1.y;
@@ -230,14 +241,14 @@ public class StaticMesh {
                     textures[flagT] = t1.x;
                     textures[flagT + 1] = t1.y + textCord;
                     flagT += 2;
-
+                    
                 }
                 Vector3f v1 = rotateVectorY(m.getVertices().get(face.getVertexIndices()[0] - 1), rotate);
                 vertices[flagV] = v1.x * scale + location.x;
                 vertices[flagV + 1] = v1.y * scale + location.y;
                 vertices[flagV + 2] = v1.z * scale + location.z;
                 flagV += 3;
-
+                
                 Vector3f n2 = rotateVectorY(m.getNormals().get(face.getNormalIndices()[1] - 1), rotate);
                 normals[flagV] = n2.x;
                 normals[flagV + 1] = n2.y;
@@ -253,12 +264,12 @@ public class StaticMesh {
                 vertices[flagV + 1] = v2.y * scale + location.y;
                 vertices[flagV + 2] = v2.z * scale + location.z;
                 flagV += 3;
-
+                
                 Vector3f n3 = rotateVectorY(m.getNormals().get(face.getNormalIndices()[2] - 1), rotate);
                 normals[flagV] = n3.x;
                 normals[flagV + 1] = n3.y;
                 normals[flagV + 2] = n3.z;
-
+                
                 if (m.hasTextureCoordinates()) {
                     Vector2f t3 = m.getTextureCoordinates().get(face.getTextureCoordinateIndices()[2] - 1);
                     textures[flagT] = t3.x;
@@ -269,17 +280,17 @@ public class StaticMesh {
                 vertices[flagV] = v3.x * scale + location.x;
                 vertices[flagV + 1] = v3.y * scale + location.y;
                 vertices[flagV + 2] = v3.z * scale + location.z;
-
+                
                 flagV += 3;
             }
         }
         optModel = new VBOModel(vertices, normals, textures);
     }
-
+    
     public void drawVBO() {
         optModel.renderTextured();
     }
-
+    
     public StaticMesh(String[] fileName) {
         m = new Model[fileName.length];
         for (int i = 0; i < fileName.length; i++) {
@@ -297,7 +308,7 @@ public class StaticMesh {
             }
         }
     }
-
+    
     public void addCopy(float x, float y, float z) {
         if (count < maxCount) {
             copies[count] = new Vector3f(x, y, z);
@@ -305,7 +316,7 @@ public class StaticMesh {
             count += 1;
         }
     }
-
+    
     public void addCopy(float x, float y, float z, float r) {
         if (count < maxCount) {
             copies[count] = new Vector3f(x, y, z);
@@ -313,31 +324,31 @@ public class StaticMesh {
             count += 1;
         }
     }
-
+    
     public void setScale(float sc) {
         scale = sc;
     }
-
+    
     public void clearCopies() {
         copies = new Vector3f[maxCount];
         rotations = new float[maxCount];
         count = 0;
     }
-
+    
     public void drawModel() {
         for (int i = 0; i < count; i++) {
-
+            
             glPushMatrix();
             glTranslated(copies[i].x, copies[i].y, copies[i].z);
             glRotatef(rotations[i], 0, 1, 0);
-
+            
             if (hasText == true) {
                 texture.bind();
                 glEnable(GL_TEXTURE_2D);
             }
             glBegin(GL_TRIANGLES);
             glColor4f(1, 1, 1, 1);
-
+            
             for (Model.Face face : m[k].getFaces()) {
 
                 //Первая точка
@@ -375,24 +386,24 @@ public class StaticMesh {
             glTranslated(-copies[i].x, -copies[i].y, -copies[i].z);
             glPopMatrix();
         }
-
+        
     }
-
+    
     public void drawModel(Vector3f camLocation) {
-
+        
         for (int i = 0; i < count; i++) {
-
+            
             glPushMatrix();
             glTranslated(copies[i].x, copies[i].y, copies[i].z);
             glRotatef(rotations[i], 0, 1, 0);
-
+            
             if (hasText == true) {
                 texture.bind();
                 glEnable(GL_TEXTURE_2D);
             }
             glColor4f(1, 1, 1, 1);
             glBegin(GL_TRIANGLES);
-
+            
             for (Model.Face face : m[k].getFaces()) {
 
                 //Первая точка
@@ -430,6 +441,6 @@ public class StaticMesh {
             glTranslated(-copies[i].x, -copies[i].y, -copies[i].z);
             glPopMatrix();
         }
-
+        
     }
 }
