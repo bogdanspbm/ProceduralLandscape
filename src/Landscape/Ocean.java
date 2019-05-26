@@ -28,15 +28,15 @@ public class Ocean {
     private void generateColor() {
         for (int i = 0; i < color.length; i += 4) {
             if (biom.getVerticesVector()[i / 4 * 3 + 1] < 0.5f) {
-                color[i] = 0.3f;
-                color[i + 1] = 0.3f;
-                color[i + 2] = 0.3f;
+                color[i] = 0.6f;
+                color[i + 1] = 0.6f;
+                color[i + 2] = 1f;
                 color[i + 3] = 0.3f;
             } else {
                 color[i] = 0.9f;
                 color[i + 1] = 0.9f;
                 color[i + 2] = 0.9f;
-                color[i + 3] = 0.9f;
+                color[i + 3] = 1f;
             }
         }
     }

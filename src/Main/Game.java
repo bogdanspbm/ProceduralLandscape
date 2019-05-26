@@ -41,8 +41,9 @@ public class Game {
             biom.refresh();
             landscape.refresh();
         }
-        //ocean.draw();   
+        
         skySphere.draw();
         landscape.draw();
+        ocean.draw();   
     }
 }

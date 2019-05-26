@@ -19,8 +19,8 @@ public class Terrain {
 
     private PelenNoise noise, biom;
     private VBOModel terrainModel;
-    private Texture textureLand, textureGrass, texturePine, textureBush;
-    StaticMesh grass, tree, bushWinter;
+    private Texture textureLand, textureGrass, texturePine, textureBush, textureTree;
+    StaticMesh grass, pine, bushWinter, tree, treeB, logA, bushA, stoneA, stoneB;
     float[] vertices, textures;
 
     public Terrain() {
@@ -45,10 +45,39 @@ public class Terrain {
         bushWinter = new StaticMesh("res/models/BushWinter.obj", genRandomFoliage(100, 1000, 1), 0.5f);
         bushWinter.convertToVBOMany();
         
+        // Winter Log A
+        logA = new StaticMesh("res/models/logA.obj", genRandomFoliage(30, 1000, 1), 0.5f);
+        logA.enableRandomText();
+        logA.convertToVBOMany();
+        
+        // Summer Bush A
+        
+        bushA = new StaticMesh("res/models/bushA.obj", genRandomFoliage(100, 1000, 0), 0.5f);
+        bushA.enableRandomText();
+        bushA.convertToVBOMany();
+        
+        // Stone A
+        stoneA = new StaticMesh("res/models/StoneA.obj", genRandomFoliage(30, 1000, 0), 0.5f);
+        stoneA.enableRandomText();
+        stoneA.convertToVBOMany();
+        
+        // Stone B
+        stoneB = new StaticMesh("res/models/StoneB.obj", genRandomFoliage(200, 1000, 0), 0.5f);
+        stoneB.enableRandomText();
+        stoneB.convertToVBOMany();
+        
         
         // Winter Tree
-        tree = new StaticMesh("res/models/PineA.obj", genRandomFoliage(100, 1000, 1), 0.7f);
+        pine = new StaticMesh("res/models/PineA.obj", genRandomFoliage(100, 1000, 1), 0.7f);
+        pine.convertToVBOMany();
+        
+        //Summer Tree A 
+        tree = new StaticMesh("res/models/TreeA.obj", genRandomFoliage(100, 1000, 0), 1.3f);
         tree.convertToVBOMany();
+        
+        //Summer Tree B
+        treeB = new StaticMesh("res/models/TreeB.obj", genRandomFoliage(10, 1000, 0), 0.4f);
+        treeB.convertToVBOMany();
     }
 
     public Terrain(float scaler, int size, float height, PelenNoise biom) {
@@ -64,6 +93,7 @@ public class Terrain {
             textureGrass = TextureLoader.getTexture("tga", new FileInputStream(new File("res/textures/T_PolygonNature_01.tga")));
             textureBush = TextureLoader.getTexture("png", new FileInputStream(new File("res/textures/BushWinter.png")));
             texturePine = TextureLoader.getTexture("png", new FileInputStream(new File("res/textures/PineA.png")));
+            textureTree = TextureLoader.getTexture("png", new FileInputStream(new File("res/textures/TreeA.png")));
         } catch (FileNotFoundException ex) {
             Logger.getLogger(Skybox.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
@@ -215,12 +245,20 @@ public class Terrain {
         
         textureGrass.bind();
         grass.drawVBO();
+        logA.drawVBO();
+        bushA.drawVBO();
+        stoneA.drawVBO();
+        stoneB.drawVBO();
         
         textureBush.bind();
         bushWinter.drawVBO();
         
         texturePine.bind();
+        pine.drawVBO();
+        
+        textureTree.bind();
         tree.drawVBO();
+        treeB.drawVBO();
     }
 
 }
