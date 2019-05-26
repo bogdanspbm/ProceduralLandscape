@@ -19,8 +19,8 @@ public class Terrain {
 
     private PelenNoise noise, biom;
     private VBOModel terrainModel;
-    private Texture textureLand, textureGrass, texturePine;
-    StaticMesh grass, tree;
+    private Texture textureLand, textureGrass, texturePine, textureBush;
+    StaticMesh grass, tree, bushWinter;
     float[] vertices, textures;
 
     public Terrain() {
@@ -29,15 +29,24 @@ public class Terrain {
     }
 
     public final void refresh() {
-        int grassCount;
+        int grassCount, bushCount;
         noise.refresh();
         vertices = noise.getVerticesVector();
         makeTexturesVector();
         terrainModel = new VBOModel(vertices, textures);
+        
+        // Summer Grass
         grassCount = calcGrassPlacesCount(3, 0);
         grass = new StaticMesh("res/models/Grass.obj", genFoliage(grassCount, 3, 0), 0.5f);
         grass.enableRandomText();
         grass.convertToVBOMany();
+        
+        // Winter Bush
+        bushWinter = new StaticMesh("res/models/BushWinter.obj", genRandomFoliage(100, 1000, 1), 0.5f);
+        bushWinter.convertToVBOMany();
+        
+        
+        // Winter Tree
         tree = new StaticMesh("res/models/PineA.obj", genRandomFoliage(100, 1000, 1), 0.7f);
         tree.convertToVBOMany();
     }
@@ -53,6 +62,7 @@ public class Terrain {
         try {
             textureLand = TextureLoader.getTexture("tga", new FileInputStream(new File("res/textures/TerrainTexture.tga")));
             textureGrass = TextureLoader.getTexture("tga", new FileInputStream(new File("res/textures/T_PolygonNature_01.tga")));
+            textureBush = TextureLoader.getTexture("png", new FileInputStream(new File("res/textures/BushWinter.png")));
             texturePine = TextureLoader.getTexture("png", new FileInputStream(new File("res/textures/PineA.png")));
         } catch (FileNotFoundException ex) {
             Logger.getLogger(Skybox.class.getName()).log(Level.SEVERE, null, ex);
@@ -202,8 +212,13 @@ public class Terrain {
     public void draw() {
         textureLand.bind();
         terrainModel.renderTextured();
+        
         textureGrass.bind();
         grass.drawVBO();
+        
+        textureBush.bind();
+        bushWinter.drawVBO();
+        
         texturePine.bind();
         tree.drawVBO();
     }
