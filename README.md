@@ -1,4 +1,4 @@
-# ProceduralLandscape
+# Procedural Landscape
 
 Проект по генерации 3D ландшафта с использованием OpenGL на Java. 
 
